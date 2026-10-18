@@ -29,7 +29,7 @@ import {importTokenFromFile, findTokenFile, TOKEN_DIR_LABEL} from '../utils/toke
 import {PERMISSION_GROUPS, getPermissionStates, ensurePermissionGroup} from '../utils/permissions';
 import ProjectPicker from '../components/ProjectPicker';
 import AISettingsFields from '../components/AISettingsFields';
-const {normalizeAIModels} = require('../utils/aiModels');
+const {DEFAULT_AI_MODEL, normalizeAIModels} = require('../utils/aiModels');
 import LauncherSettings from '../launcher/LauncherSettings';
 const {isProjectVisible, toggleProjectVisibility} = require('../utils/projectVisibility');
 import {useLocations} from '../collections/useLocations';
@@ -131,8 +131,8 @@ export default function Config({nav, initialPage}: Props) {
   const [defaultProjectId, setDefaultProjectId] = useState<string | null>(cfg0?.defaultProjectId || null);
   const [defaultSectionId, setDefaultSectionId] = useState<string | null>(cfg0?.defaultSectionId || null);
   const [aiApiKey, setAiApiKey] = useState(cfg0?.aiApiKey || '');
-  const [aiModel, setAiModel] = useState(cfg0?.aiModel || 'gpt-4.1-mini');
-  const [aiModels, setAiModels] = useState<string[]>(() => normalizeAIModels(cfg0?.aiModels, cfg0?.aiModel || 'gpt-4.1-mini'));
+  const [aiModel, setAiModel] = useState(cfg0?.aiModel || DEFAULT_AI_MODEL);
+  const [aiModels, setAiModels] = useState<string[]>(() => normalizeAIModels(cfg0?.aiModels, cfg0?.aiModel || DEFAULT_AI_MODEL));
   const [aiByDefault, setAiByDefault] = useState(cfg0?.aiByDefault === true);
   const [aiSaving, setAiSaving] = useState(false);
   const [aiStatus, setAiStatus] = useState('');
@@ -142,8 +142,8 @@ export default function Config({nav, initialPage}: Props) {
   const [debugServerUrl, setDebugServerUrlField] = useState(cfg0?.debugServerUrl || '');
   const [fontScale, setFontScaleField] = useState(cfg0?.fontScale || 1);
   const [importStatus, setImportStatus] = useState('');
-  // Import is only a live button while supertask-token.txt is actually in
-  // MyStyle/SuperTask -- so the option reads as real when it applies and
+  // Import is only a live button while supertodoist-token.txt is actually in
+  // MyStyle/SuperTodoist -- so the option reads as real when it applies and
   // as instructions when it doesn't. Re-checked on mount, whenever the
   // token sheet closes, and after every import attempt.
   const [tokenFilePresent, setTokenFilePresent] = useState(false);
@@ -193,8 +193,8 @@ export default function Config({nav, initialPage}: Props) {
       if (config.defaultProjectId) setDefaultProjectId(config.defaultProjectId);
       setDefaultSectionId(config.defaultSectionId || null);
       setAiApiKey(config.aiApiKey || '');
-      setAiModel(config.aiModel || 'gpt-4.1-mini');
-      setAiModels(normalizeAIModels(config.aiModels, config.aiModel || 'gpt-4.1-mini'));
+      setAiModel(config.aiModel || DEFAULT_AI_MODEL);
+      setAiModels(normalizeAIModels(config.aiModels, config.aiModel || DEFAULT_AI_MODEL));
       setAiByDefault(config.aiByDefault === true);
       setAiSetupHintDismissed(config.aiSetupHintDismissed === true);
       if (config.postCreateAction) setPostCreateAction(config.postCreateAction);
@@ -265,8 +265,8 @@ export default function Config({nav, initialPage}: Props) {
   const handleSaveAISettings = async () => {
     setAiSaving(true);
     setAiStatus('');
-    const models = normalizeAIModels(aiModels, aiModel.trim() || 'gpt-4.1-mini');
-    const ok = await applyChange('aiSettings', {aiApiKey: aiApiKey.trim(), aiModel: aiModel.trim() || 'gpt-4.1-mini', aiModels: models});
+    const models = normalizeAIModels(aiModels, aiModel.trim() || DEFAULT_AI_MODEL);
+    const ok = await applyChange('aiSettings', {aiApiKey: aiApiKey.trim(), aiModel: aiModel.trim() || DEFAULT_AI_MODEL, aiModels: models});
     setAiStatus(ok ? 'Saved privately on this device.' : 'Could not save settings.');
     setAiSaving(false);
   };
@@ -295,7 +295,7 @@ export default function Config({nav, initialPage}: Props) {
       const ok = await applyChange('aiSettings', changes);
       if (!ok) {
         const durable = getCachedConfig();
-        const savedModel = durable?.aiModel || 'gpt-4.1-mini';
+        const savedModel = durable?.aiModel || DEFAULT_AI_MODEL;
         setAiModels(normalizeAIModels(durable?.aiModels, savedModel));
         if (selectedModel !== undefined) setAiModel(savedModel);
       }
@@ -341,7 +341,7 @@ export default function Config({nav, initialPage}: Props) {
     applyChange('token', {apiToken: token.trim()});
   };
 
-  // F-029: no-cable auth -- find supertask-token.txt in a synced folder,
+  // F-029: no-cable auth -- find supertodoist-token.txt in a synced folder,
   // import it, delete the plaintext file
   const handleImportToken = async () => {
     setImportStatus('Searching synced folders...');
@@ -549,8 +549,8 @@ export default function Config({nav, initialPage}: Props) {
             label="Import token from file"
             hint={
               tokenFilePresent
-                ? `supertask-token.txt found in ${TOKEN_DIR_LABEL}. Tap Import to use it.`
-                : `Put supertask-token.txt in ${TOKEN_DIR_LABEL} and Import becomes available. Tap ? for steps.`
+                ? `supertodoist-token.txt found in ${TOKEN_DIR_LABEL}. Tap Import to use it.`
+                : `Put supertodoist-token.txt in ${TOKEN_DIR_LABEL} and Import becomes available. Tap ? for steps.`
             }
             onInfo={() => setInfoSheet('token')}
             saved={savedRow === 'token'}>
@@ -573,8 +573,8 @@ export default function Config({nav, initialPage}: Props) {
           {!token && wasTemplateGenerated() && (
             <View style={s.notice}>
               <Text style={s.noticeText}>
-                No token yet. Easiest: sync a supertask-token.txt file into
-                MyStyle/SuperTask from your phone and tap Import above. Tap ?
+                No token yet. Easiest: sync a supertodoist-token.txt file into
+                MyStyle/SuperTodoist from your phone and tap Import above. Tap ?
                 for all options (USB config file, Bluetooth keyboard,
                 on-screen keyboard).
               </Text>
@@ -872,9 +872,9 @@ export default function Config({nav, initialPage}: Props) {
         title="How to enter your API token"
         intro={'1. In Todoist, go to Settings > Integrations > Developer (todoist.com/prefs/integrations). Copy your API token, or issue a new one there.\n\n2. Pick one of the options below. You only need to do this once: the token is saved in SuperTodoist’s private device folder. Uninstalling or clearing PluginHost data can erase it.'}
         sections={[
-          {label: 'Option 1. Import a temporary token file over USB', body: 'From your phone or computer, create a plain text file named **supertask-token.txt** containing only the token.\n\nCreate **MyStyle/SuperTask** over USB if necessary and put the file there. A token file sent through a cloud service can remain in cloud history; direct paste or USB avoids that shared copy.\n\nClose this sheet. Once the file is in place, the **Import** button on the Setup page becomes available; tap it and SuperTodoist saves the token and deletes the file. Only that one folder is checked.'},
+          {label: 'Option 1. Import a temporary token file over USB', body: 'From your phone or computer, create a plain text file named **supertodoist-token.txt** containing only the token.\n\nCreate **MyStyle/SuperTodoist** over USB if necessary and put the file there. A token file sent through a cloud service can remain in cloud history; direct paste or USB avoids that shared copy.\n\nClose this sheet. Once the file is in place, the **Import** button on the Setup page becomes available; tap it and SuperTodoist saves the token and deletes the file. Only that one folder is checked.'},
           {label: 'Option 2. Paste the token with a Bluetooth keyboard', body: 'Pair a Bluetooth keyboard (Supernote Settings > Bluetooth), tap the **Todoist API token** field on the Setup page, paste with Ctrl+V, then tap **Save**.'},
-          {label: 'Private storage', body: 'New settings are saved privately. The old shared config is read only for migration, then its credentials are redacted when shared write access is available. Shared copies previously synced to cloud services may remain in their history.'},
+          {label: 'Private storage', body: 'Settings, credentials, cached tasks, queues and logs are saved in this plugin’s private device folder. Settings from the separate SuperTask installation are not imported automatically.'},
           {label: 'Option 4. Type it with the on-screen keyboard', body: 'Tap the **Todoist API token** field on the Setup page and type the 40-character token by hand, then tap **Save**. Slow, but it works with nothing else set up.'},
         ]}
         onClose={() => { setInfoSheet(null); checkTokenFile(); }}
@@ -990,10 +990,10 @@ export default function Config({nav, initialPage}: Props) {
       <InfoSheet
         visible={infoSheet === 'permissions'}
         title="What SuperTodoist is allowed to do"
-        intro="Supernote firmware 3.29.44 (2.26.41 on A5X/A6X) lets you decide, per plugin, what it may touch. SuperTodoist needs three things, and Supernote asks you about each one the first time it is needed: shared access for migration, import and source-note navigation, network access for Todoist or optional AI, and deletion when you import a token file. Private offline storage needs no shared-file permission. Say no to any of them and the matching feature simply stops working."
+        intro="Supernote firmware 3.29.44 (2.26.41 on A5X/A6X) lets you decide, per plugin, what it may touch. SuperTodoist needs shared access for explicit token-file import and source-note navigation, network access for Todoist or optional AI, and deletion when you import a token file. Private offline storage needs no shared-file permission. Say no to any of them and the matching feature simply stops working."
         sections={[
           ...PERMISSION_GROUPS.map(g => ({label: g.label, body: g.why})),
-          {label: 'In short', body: 'Credentials, queues, cached tasks and logs live in the private plugin folder. Shared files are used for migration and explicit token import. Batch capture leaves handwriting unchanged. Todoist sync is automatic while SuperTodoist is open. AI by default is off until you enable it in Settings; when enabled, lasso capture sends the selected handwriting image and task details to OpenAI for AI-first recognition while device OCR runs at the same time. Refine with AI sends selected rows and, when the full capture is selected, its image. Both use your configured API key. Logs are uploaded only by an explicit action. If you said no and change your mind, use Allow missing on this screen.'},
+          {label: 'In short', body: 'Credentials, queues, cached tasks and logs live in this plugin’s private folder. Shared files are used for explicit token import and source-note checks. SuperTask settings are not imported automatically. Batch capture leaves handwriting unchanged. Todoist sync is automatic while SuperTodoist is open. AI by default is off until you enable it in Settings; when enabled, lasso capture sends the selected handwriting image and task details to OpenAI for AI-first recognition while device OCR runs at the same time. Refine with AI sends selected rows and, when the full capture is selected, its image. Both use your configured API key. Logs are uploaded only by an explicit action. If you said no and change your mind, use Allow missing on this screen.'},
         ]}
         onClose={() => setInfoSheet(null)}
       />

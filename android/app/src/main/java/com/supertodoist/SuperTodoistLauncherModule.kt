@@ -1,4 +1,4 @@
-package com.supertask
+package com.supertodoist
 
 import android.content.Context
 import android.app.AppOpsManager
@@ -48,7 +48,7 @@ import kotlin.math.roundToInt
  * Overlay flags / tagged orphan cleanup are adapted from AgP42's SuperDashboard
  * DashboardNativeModule (MIT). Drawing, edge persistence and lifecycle are local.
  */
-class TaskLauncherModule(private val context: ReactApplicationContext) :
+class SuperTodoistLauncherModule(private val context: ReactApplicationContext) :
     ReactContextBaseJavaModule(context), LifecycleEventListener {
     private val main = Handler(Looper.getMainLooper())
     private val worker = Executors.newSingleThreadExecutor()
@@ -73,7 +73,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
         ?.firstOrNull { it == "com.ratta.supernote.pluginhost" } ?: context.packageName
     // PluginHost can load a replacement classloader before invalidating the old
     // module. A process-wide preferences token retires even invisible old owners.
-    private val ownership = context.getSharedPreferences("SuperTaskLauncherOwnership", Context.MODE_PRIVATE)
+    private val ownership = context.getSharedPreferences("SuperTodoistLauncherOwnership", Context.MODE_PRIVATE)
     private val ownerToken = UUID.randomUUID().toString()
     private fun ownsLauncher() = ownership.getString("owner", null) == ownerToken
     private val screenReceiver = object : BroadcastReceiver() {
@@ -86,7 +86,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
             }
         }
     }
-    private val tag = "SuperTask.edgeLauncher.v1"
+    private val tag = "SuperTodoist.edgeLauncher.v1"
 
     init {
         ownership.edit().putString("owner", ownerToken).apply()
@@ -94,9 +94,9 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
         val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF); addAction(Intent.ACTION_SCREEN_ON) }
         if (Build.VERSION.SDK_INT >= 33) context.registerReceiver(screenReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
         else context.registerReceiver(screenReceiver, filter)
-        main.post { clearOrphans(); Log.i("TaskLauncher", "Finger-only launcher ready; scoped pen protection unavailable") }
+        main.post { clearOrphans(); Log.i("SuperTodoistLauncher", "Finger-only launcher ready; scoped pen protection unavailable") }
     }
-    override fun getName() = "TaskLauncher"
+    override fun getName() = "SuperTodoistLauncher"
     private fun dp(value: Int) = (value * context.resources.displayMetrics.density).roundToInt()
     private fun metrics(): DisplayMetrics = DisplayMetrics().also { wm.defaultDisplay.getRealMetrics(it) }
     private fun emit(name: String, value: WritableMap = Arguments.createMap()) {
@@ -265,7 +265,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
             installTouch(panel)
             wm.addView(panel, params)
             panel.invalidate() // local e-ink repaint; no global refresh-mode changes
-        } catch (e: Exception) { removeWindow(); Log.w("TaskLauncher", "Overlay unavailable", e); emit("SuperTaskLauncherError", Arguments.createMap().apply { putString("message", e.message) }) }
+        } catch (e: Exception) { removeWindow(); Log.w("SuperTodoistLauncher", "Overlay unavailable", e); emit("SuperTodoistLauncherError", Arguments.createMap().apply { putString("message", e.message) }) }
     }
 
     private fun place(update: Boolean = true) {
@@ -320,7 +320,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
                             edge = if (p.x + p.width / 2 < m.widthPixels / 2) "left" else "right"
                             fraction = p.y.toDouble() / max(1, m.heightPixels - p.height)
                             place()
-                            emit("SuperTaskLauncherPosition", Arguments.createMap().apply { putString("edge", edge); putDouble("position", fraction) })
+                            emit("SuperTodoistLauncherPosition", Arguments.createMap().apply { putString("edge", edge); putDouble("position", fraction) })
                         } else if (!held && e.eventTime - downAt in 0..799 && e.eventTime - lastTap > 1500) {
                             lastTap = e.eventTime; v.performClick()
                         }
@@ -376,7 +376,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
             }
             menuWindow = menu; wm.addView(menu, layout); menu.invalidate()
             main.removeCallbacks(dismissMenu); main.postDelayed(dismissMenu, 10000)
-        } catch (e: Exception) { removeMenu(); Log.w("TaskLauncher", "Menu unavailable", e) }
+        } catch (e: Exception) { removeMenu(); Log.w("SuperTodoistLauncher", "Menu unavailable", e) }
     }
     private fun removeMenu() {
         main.removeCallbacks(dismissMenu)
@@ -387,7 +387,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
         if (!ownsLauncher()) { removeWindow(); return }
         ownership.edit().putBoolean("hidePending", true).apply()
         enabled = false; generation++; main.removeCallbacks(poll); removeWindow()
-        emit("SuperTaskLauncherHide")
+        emit("SuperTodoistLauncherHide")
     }
 
     private fun launch(route: String = "tasks") {
@@ -417,15 +417,15 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
             val response = PromiseImpl(Callback {
                 // The SDK has accepted its native UI operation. Do not mark React
                 // foreground or route anywhere on rejection or a thrown invocation.
-                main.post { if (!disposed && ownsLauncher()) emit("SuperTaskLauncherTap", Arguments.createMap().apply { putString("route", route) }) }
+                main.post { if (!disposed && ownsLauncher()) emit("SuperTodoistLauncherTap", Arguments.createMap().apply { putString("route", route) }) }
             }, Callback { args ->
-                main.post { launching = false; emit("SuperTaskLauncherError", Arguments.createMap().apply { putString("message", "Could not open tasks") }); schedule() }
-                Log.w("TaskLauncher", "showPluginView rejected (${args.size} fields)")
+                main.post { launching = false; emit("SuperTodoistLauncherError", Arguments.createMap().apply { putString("message", "Could not open tasks") }); schedule() }
+                Log.w("SuperTodoistLauncher", "showPluginView rejected (${args.size} fields)")
             })
             method.invoke(manager, response)
         } catch (e: Exception) {
-            launching = false; Log.w("TaskLauncher", "Launch failed", e)
-            emit("SuperTaskLauncherError", Arguments.createMap().apply { putString("message", "Could not open tasks") })
+            launching = false; Log.w("SuperTodoistLauncher", "Launch failed", e)
+            emit("SuperTodoistLauncherError", Arguments.createMap().apply { putString("message", "Could not open tasks") })
             schedule()
         }
     }
@@ -444,9 +444,9 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
             val field = klass.getDeclaredField("mViews").apply { isAccessible = true }
             val views = (field.get(owner) as? List<*>)?.toList() ?: return
             for (value in views) if (value is View && (value.tag == tag || value.tag == "$tag.menu") && value !== window && value !== menuWindow) try { wm.removeViewImmediate(value) } catch (_: Exception) {}
-        } catch (e: Exception) { Log.w("TaskLauncher", "Tagged orphan inspection unavailable", e) }
+        } catch (e: Exception) { Log.w("SuperTodoistLauncher", "Tagged orphan inspection unavailable", e) }
     }
-    override fun onHostResume() { main.post { emit("SuperTaskLauncherResume"); schedule() } }
+    override fun onHostResume() { main.post { emit("SuperTodoistLauncherResume"); schedule() } }
     override fun onHostPause() {}
     override fun onHostDestroy() { stop() }
     override fun invalidate() { dispose(); super.invalidate() }

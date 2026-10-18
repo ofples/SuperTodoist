@@ -37,9 +37,9 @@ test('one tap selects and saves a model, then closes the dropdown', async () => 
   }
   await act(async () => {tree = create(React.createElement(Harness));});
   await act(async () => findButton(tree, `Selected AI model ${DEFAULT_AI_MODELS[0]}. Show model list`).props.onPress());
-  await act(async () => findButton(tree, 'Select model gpt-4.1').props.onPress());
-  assert.deepEqual(calls, ['gpt-4.1']);
-  assert.ok(findButton(tree, 'Selected AI model gpt-4.1. Show model list'));
+  await act(async () => findButton(tree, 'Select model gpt-6.1-sol').props.onPress());
+  assert.deepEqual(calls, ['gpt-6.1-sol']);
+  assert.ok(findButton(tree, 'Selected AI model gpt-6.1-sol. Show model list'));
   await act(async () => tree.unmount());
 });
 

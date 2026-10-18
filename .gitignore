@@ -63,6 +63,7 @@ devconfig.json
 .env.*
 !.env.example
 supertask-token.txt
+supertodoist-token.txt
 *.snplg
 *.hbc
 

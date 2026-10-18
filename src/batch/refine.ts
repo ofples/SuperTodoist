@@ -5,6 +5,7 @@ import {loadConfig} from '../utils/config';
 import {ensurePermissionGroup} from '../utils/permissions';
 const {batchSchema, validateProposal} = require('./model');
 const {localDate} = require('../offline/model');
+const {DEFAULT_AI_MODEL} = require('../utils/aiModels');
 
 export async function refineBatch(rows: any[], projects: any[], capturedAt: number,
   image: string | undefined, signal: AbortSignal, sections: any[] = []): Promise<any[]> {
@@ -13,7 +14,7 @@ export async function refineBatch(rows: any[], projects: any[], capturedAt: numb
   if (!await ensurePermissionGroup('sync')) throw new Error('Internet permission is required for AI refinement.');
   if (signal.aborted) throw new Error('AI refinement cancelled.');
   const model = createOpenAI({apiKey: config.aiApiKey.trim(), fetch: providerFetch})
-    .responses(config.aiModel?.trim() || 'gpt-4.1-mini');
+    .responses(config.aiModel?.trim() || DEFAULT_AI_MODEL);
   const schema = jsonSchema<any>(batchSchema, {validate: value => {
     try { validateProposal(value, projects, sections, rows); return {success: true, value}; }
     catch (error) { return {success: false, error: error as Error}; }

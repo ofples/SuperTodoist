@@ -1,4 +1,4 @@
-# Release checks: 0.4.0-beta.29
+# Historical release checks: 0.4.0-beta.29
 
 Checked on 18 October 2026 for the first standalone SuperTodoist prerelease.
 
@@ -28,7 +28,7 @@ The build reused the existing pinned dependency installation through an ignored 
 
 No device or emulator was available for this release. The earlier beta.28 was installed on a Nomad during development; its results do not verify this renamed beta.29 package. In particular, update-in-place, the renamed listing/toolbar, task capture, offline reconnection/conflicts, recurring completions, board pagination, and multi-selection should be exercised on scratch content before relying on the prerelease.
 
-The plugin ID, registration key, native package, note-link scheme, and private storage paths are unchanged to preserve update compatibility. Do not uninstall SuperTask or clear PluginHost data to update.
+This beta.29 package retained the SuperTask plugin ID, registration key, native package, note-link scheme, and private storage paths. Those facts apply only to beta.29; v0.5.0 uses an independent SuperTodoist identity and storage location. Do not use this historical section as installation guidance for v0.5.0.
 
 ## Dependency audit
 

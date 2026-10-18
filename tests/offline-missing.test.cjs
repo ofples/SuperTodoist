@@ -194,7 +194,7 @@ test('an incomplete transport snapshot cannot mark or hide a cached acknowledged
 function loadService(state) {
   const filename = path.resolve(__dirname, '../src/offline/service.js'), disk = diskFor(state);
   const config = {apiToken: 'test-only'};
-  const mocks = {'react-native': {NativeModules: {TaskStorage: {
+  const mocks = {'react-native': {NativeModules: {SuperTodoistStorage: {
     initialize: async () => JSON.stringify({accountKey: 'account', deviceId: 'device'}),
     read: async () => JSON.stringify(await disk.read()), commit: (...args) => disk.commit(args[1], args[2]),
   }}}, 'sn-plugin-lib': {PluginManager: {getPluginDirPath: async () => '/private'}},

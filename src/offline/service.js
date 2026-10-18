@@ -31,7 +31,7 @@ async function openSession() {
   const token = config.apiToken?.trim();
   if (!token) {throw new Error('Configure your Todoist token first. Offline tasks are kept separately for each configured token.');}
   if (session?.token === token) {return session;}
-  const storage = NativeModules.TaskStorage;
+  const storage = NativeModules.SuperTodoistStorage;
   if (!storage) {throw new Error('Private task storage is missing. Install the complete updated SuperTodoist package.');}
   const dir = await PluginManager.getPluginDirPath();
   if (!dir) {throw new Error('PluginHost did not provide private storage. No task data was written to shared storage.');}
@@ -57,7 +57,7 @@ export function offlineSession() {
 }
 
 async function idGenerator(count) {
-  const values = JSON.parse(await NativeModules.TaskStorage.newIds(count));
+  const values = JSON.parse(await NativeModules.SuperTodoistStorage.newIds(count));
   return () => {
     if (!values.length) {throw new Error('Task identity pool exhausted.');}
     return values.shift();
@@ -74,7 +74,7 @@ export async function saveOfflineBatch(drafts, source = null, capturedAt = Date.
   const current = await offlineSession();
   bindRequest(current, request);
   if (!request.ids) {
-    request.ids = JSON.parse(await NativeModules.TaskStorage.newIds(1 + drafts.length * 3));
+    request.ids = JSON.parse(await NativeModules.SuperTodoistStorage.newIds(1 + drafts.length * 3));
   }
   const batchId = request.ids[0];
   const alreadySaved = Object.values((await current.store.load()).tasks).filter(task => task.batchId === batchId);
@@ -186,7 +186,7 @@ export async function rememberCompleted(tasks) {
 }
 
 async function mutationIdentity(request, count) {
-  if (!request.ids) {request.ids = JSON.parse(await NativeModules.TaskStorage.newIds(count));}
+  if (!request.ids) {request.ids = JSON.parse(await NativeModules.SuperTodoistStorage.newIds(count));}
   let index = 1;
   return {requestId: request.ids[0], ids: () => {
     if (index >= request.ids.length) {throw new Error('Mutation identity pool exhausted. Retain this request for retry.');}

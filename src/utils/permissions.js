@@ -34,8 +34,8 @@
  *      others appear where the reason is self-evident.
  *   3. Technical names appear only inside the expanded "why" text.
  *
- * Scope discipline: every file SuperTodoist reads or writes lives in
- * MyStyle/SuperTask, except two read-only exists() pre-flights on note paths.
+ * Scope discipline: shared-file reads and deletes are limited to the user's
+ * explicit token import file and source-note existence checks.
  * Persistence never deletes: atomic writes rename over the old file, the
  * cache is invalidated by overwriting, the log rotates by copy+truncate. The
  * only delete is the token file after import.
@@ -69,11 +69,11 @@ const SHORT = {
 export const PERMISSION_GROUPS = [
   {
     id: 'folder',
-    label: 'Import legacy settings and open source notes',
+    label: 'Import a token file and open source notes',
     summary: 'Optional shared-folder access. Private task storage needs no file permission.',
-    why: 'SuperTodoist reads its old settings and task references from MyStyle/SuperTask during migration and can redact the old token after saving privately. Shared access also lets it import a token file and check source notes before opening them. New credentials, cached tasks, queues and troubleshooting logs stay in its private folder. Batch capture reads your lasso selection through Supernote without changing the note. (FILE:READ and FILE:WRITE.)',
+    why: 'SuperTodoist reads the token file only when you explicitly tap Import, checks source-note paths before opening them, and can add a task link or recognized text to a note when you choose those actions. Credentials, cached tasks, queues and troubleshooting logs stay in its private folder. Batch capture leaves handwriting unchanged. (FILE:READ and FILE:WRITE.)',
     permissions: [READ, WRITE],
-    desc: 'Allow shared access for legacy migration, token import and source-note navigation. Private settings and offline tasks do not require this.',
+    desc: 'Allow source-note checks and explicit token-file import. Private settings and offline tasks do not require this.',
   },
   {
     id: 'sync',

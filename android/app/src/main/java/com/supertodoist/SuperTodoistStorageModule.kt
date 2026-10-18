@@ -1,4 +1,4 @@
-package com.supertask
+package com.supertodoist
 
 import android.system.Os
 import android.system.OsConstants
@@ -20,8 +20,8 @@ import java.security.MessageDigest
 import java.util.UUID
 
 /** Durable, strictly plugin-private generations. Never falls back to sdcard. */
-class TaskStorageModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
-    override fun getName() = "TaskStorage"
+class SuperTodoistStorageModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
+    override fun getName() = "SuperTodoistStorage"
     private val lock = Any()
     private var root: File? = null
 
@@ -32,7 +32,7 @@ class TaskStorageModule(context: ReactApplicationContext) : ReactContextBaseJava
 
     private fun prepareDirectory(pluginDir: String): File {
         val sdkDir = File(pluginDir).canonicalFile
-        val allowed = File(reactApplicationContext.applicationContext.filesDir, "plugins/supertask001").canonicalFile
+        val allowed = File(reactApplicationContext.applicationContext.filesDir, "plugins/supertodoist001").canonicalFile
         require(sdkDir == allowed) { "PluginHost returned an unexpected private directory" }
         val dir = File(sdkDir, "offline-v1")
         require(dir.isDirectory || dir.mkdirs()) { "Cannot create private task directory" }

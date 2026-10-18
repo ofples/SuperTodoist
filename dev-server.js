@@ -44,7 +44,7 @@ const server = http.createServer((req, res) => {
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `supertask-${timestamp}.txt`;
+      const filename = `supertodoist-${timestamp}.txt`;
       fs.writeFileSync(path.join(LOG_DIR, filename), body);
 
       console.log('\n' + '='.repeat(60));
@@ -63,7 +63,7 @@ const server = http.createServer((req, res) => {
     // /ping doubles as a discovery/identity endpoint: the device (or a future
     // subnet sweep) can confirm this is the SuperTodoist log server.
     res.writeHead(200, {'Content-Type': 'application/json'});
-    res.end(JSON.stringify({ok: true, service: 'supertask-dev-server', port: PORT}));
+    res.end(JSON.stringify({ok: true, service: 'supertodoist-dev-server', port: PORT}));
     return;
   }
 
@@ -77,6 +77,5 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`Listening on http://${ip}:${PORT}`);
   console.log(`\nSet in plugin Settings > Connections > Debug Log Server:`);
   console.log(`  http://${ip}:${PORT}/log`);
-  console.log(`(or USB-edit MyStyle/SuperTask/supertask-config.json)`);
   console.log(`\nWaiting for logs...\n`);
 });

@@ -8,4 +8,4 @@ For changes, run the relevant offline tests, TypeScript check, and lint. For pac
 
 Never commit API tokens, local config, private logs, note images, device exports, or personal device identifiers. Do not upload or publish an artifact without permission from the repository owner.
 
-Preserve the SuperTask device identity (`pluginID=supertask001`, `pluginKey=SuperTask`), native package `com.supertask`, and legacy `MyStyle/SuperTask` paths unless an explicit migration is designed and reviewed. SuperTodoist cannot coexist with SuperTask under the shared plugin identity.
+Preserve SuperTodoist's standalone identity (`pluginID=supertodoist001`, `pluginKey=SuperTodoist`), native package `com.supertodoist`, and its `MyStyle/SuperTodoist` token-import path. Changes to identity or private-storage conventions need an explicit migration design and review. Do not add undocumented migration from SuperTask's private storage or queue.

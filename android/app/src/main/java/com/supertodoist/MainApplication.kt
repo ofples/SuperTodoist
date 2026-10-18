@@ -1,4 +1,4 @@
-package com.supertask
+package com.supertodoist
 
 import android.app.Application
 import com.facebook.react.PackageList
@@ -18,7 +18,7 @@ class MainApplication : Application(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              add(NoteOpenerPackage())
+              add(SuperTodoistNativePackage())
             }
 
         override fun getJSMainModuleName(): String = "index"

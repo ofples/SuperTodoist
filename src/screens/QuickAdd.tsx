@@ -26,6 +26,7 @@ import PriorityPicker from '../components/PriorityPicker';
 import ProjectPicker from '../components/ProjectPicker';
 import {useFontScale} from '../utils/useFontScale';
 import {clampRectToPage} from '../utils/rectUtils';
+const {createTaskLink, createNoteReference} = require('../utils/taskIdentity');
 
 type Nav = {
   push: (name: string, params?: Record<string, any>) => void;
@@ -210,7 +211,7 @@ export default function QuickAdd({nav}: {nav: Nav}) {
       let fullDescription = description.trim();
       const nc = noteContextRef.current;
       if (nc) {
-        const noteRef = `\n\n---\n[SuperTask] Captured from: ${nc.filePath} p.${nc.pageNum}`;
+        const noteRef = createNoteReference(nc.filePath, nc.pageNum);
         fullDescription = fullDescription ? fullDescription + noteRef : noteRef.trim();
       }
 
@@ -278,7 +279,7 @@ export default function QuickAdd({nav}: {nav: Nav}) {
         right: bounds.left + textWidth,
         bottom: bounds.top + textHeight,
       };
-      const destPath = `supertask://task/${task?.id}`;
+      const destPath = createTaskLink(task?.id);
       log('QuickAdd', `insertTextLink: l=${textRect.left} t=${textRect.top} fontSize=${fontSize} dest=${destPath}`);
       const linkResult = await withTimeout(PluginNoteAPI.insertTextLink({
         destPath,
@@ -334,7 +335,7 @@ export default function QuickAdd({nav}: {nav: Nav}) {
     const {bounds} = noteContextRef.current;
     const task = createdTaskRef.current;
     try {
-      const destPath = `supertask://task/${task?.id}`;
+      const destPath = createTaskLink(task?.id);
       log('QuickAdd', `setLassoStrokeLink: destPath=${destPath}`);
       const markResult = await withTimeout(PluginNoteAPI.setLassoStrokeLink({
         destPath,

@@ -3,13 +3,13 @@
   "desc": "Offline Todoist tasks, note links, collections, and optional AI",
   "author": "Ofer Plesser (fork of SuperTask by apclark31)",
   "iconPath": "assets/icon.png",
-  "versionName": "0.4.0-beta.29",
-  "versionCode": "34",
-  "pluginID": "supertask001",
-  "pluginKey": "SuperTask",
+  "versionName": "0.5.0",
+  "versionCode": "35",
+  "pluginID": "supertodoist001",
+  "pluginKey": "SuperTodoist",
   "jsMainPath": "index",
   "reactPackages": [
-    "com.supertask.NoteOpenerPackage"
+    "com.supertodoist.SuperTodoistNativePackage"
   ],
   "uses-permissions": [
     "plugin.permission.FILE:READ",

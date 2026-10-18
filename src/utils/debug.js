@@ -179,7 +179,7 @@ export async function exportLog() {
     if (!dirExists) {
       await RNFS.mkdir(LOG_DIR);
     }
-    const fileName = `supertask-${timestamp}.txt`;
+    const fileName = `supertodoist-${timestamp}.txt`;
     await RNFS.writeFile(`${LOG_DIR}/${fileName}`, logText, 'utf8');
     return 'Log saved privately on this device. Configure a server for explicit upload.';
   } catch (err) {

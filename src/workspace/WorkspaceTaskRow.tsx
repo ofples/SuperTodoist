@@ -2,6 +2,7 @@ import React, {createContext, useContext} from 'react';
 import {View, Text} from 'react-native';
 import TaskRow from '../components/TaskRow';
 import TaskQuickActions from '../components/TaskQuickActions';
+const {stripNoteReference} = require('../utils/taskIdentity');
 export const WorkspaceContext = createContext<any>(null);
 export default function WorkspaceTaskRow(props: any) {
   const workspace = useContext(WorkspaceContext);
@@ -17,7 +18,7 @@ export default function WorkspaceTaskRow(props: any) {
   const protectedHistory = workspace.protectedHistory(task);
   const excludedFromSelection = workspace.selectionMode && !workspace.canSelect(task);
   const rawDescription = String(task.description || '');
-  const inlineDescription = rawDescription.split(/\n*---\n\[SuperTask\] Captured from:/)[0].trim();
+  const inlineDescription = stripNoteReference(rawDescription);
   return <View>
     <TaskRow {...props} task={task} checked={workspace.selectionMode ? false : checked} selected={workspace.selectionMode && selected}
       outlineSelected={expanded}

@@ -3,8 +3,7 @@
  *
  * Users already move files onto the device wirelessly (Supernote Partner
  * app, Supernote Cloud, or USB). So: save the Todoist API token into a file
- * named `supertask-token.txt`, put it in MyStyle/SuperTask (the folder the
- * plugin creates on first run, next to supertask-config.json), tap Import in
+ * named `supertodoist-token.txt`, put it in MyStyle/SuperTodoist, tap Import in
  * Settings. The plugin saves the token (auto-obfuscated by the config layer)
  * and DELETES the plaintext file.
  *
@@ -24,12 +23,12 @@ import {log} from './debug';
 import {saveConfig} from './config';
 import {ensurePermissionGroup} from './permissions';
 
-const TOKEN_FILENAME = 'supertask-token.txt';
+const TOKEN_FILENAME = 'supertodoist-token.txt';
 
 // The plugin's own folder -- same as config.js CONFIG_DIR. The only place
 // the importer looks.
-export const TOKEN_DIR = '/storage/emulated/0/MyStyle/SuperTask';
-export const TOKEN_DIR_LABEL = 'MyStyle/SuperTask';
+export const TOKEN_DIR = '/storage/emulated/0/MyStyle/SuperTodoist';
+export const TOKEN_DIR_LABEL = 'MyStyle/SuperTodoist';
 const SCAN_ROOTS = [TOKEN_DIR];
 
 /**

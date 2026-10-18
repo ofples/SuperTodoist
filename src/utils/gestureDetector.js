@@ -5,11 +5,11 @@
  *
  * 1. LONG PRESS (static hold) -- always active:
  *    - Finger down, hold >= 800ms, NO movement, finger up
- *    - Scans for supertask:// links at touch point -> opens task detail
+ *    - Scans current and legacy task links at touch point -> opens task detail
  *
  * 2. LASSO-ADD (hold then drag) -- config 'finger' only:
  *    - Finger down, hold >= 400ms, THEN start moving (draw selection)
- *    - Aborted if the DOWN point sits on an existing supertask link
+ *    - Aborted if the DOWN point sits on an existing task link
  *    - Bounding box of movement -> programmatic lassoElements -> QuickAdd
  *    - Minimum 50x50px bbox required to avoid tiny accidental selections
  *
@@ -82,12 +82,13 @@ let _dimensionSub = null;
 let _rotationSub = null;
 function updateSwipeDimensions() {
   // MotionEvent uses physical pixels, not RN logical layout units.
-  NativeModules.TaskLauncher?.getStatus().then(status => {
+  NativeModules.SuperTodoistLauncher?.getStatus().then(status => {
     _strictSwipe.setDimensions(status.width, status.height);
     _edgeStream = false;
   }).catch(() => { _strictSwipe.setDimensions(0, 0); });
 }
 import {log} from './debug';
+const {taskIdFromLink} = require('./taskIdentity');
 import {loadConfig, resolveDefaultTab} from './config';
 import {fetchTaskData} from '../cache/taskCache';
 import {isViewOpen, getCurrentScreen, markViewOpen} from './viewState';
@@ -634,7 +635,7 @@ async function openTaskHome(trigger) {
     log('Gesture', `${trigger} -> tab: ${focusTab}`);
     // Prefetch task data while React mounts (fire-and-forget)
     fetchTaskData().catch(() => {});
-    global.__superTaskDeepLink = {action: 'this-page', focusTab};
+    global.__superTodoistDeepLink = {action: 'this-page', focusTab};
     openPluginView();
   } catch (e) {
     log('Gesture', `openTaskHome(${trigger}) error: ${e.message}`);
@@ -740,11 +741,11 @@ async function scanLinksAt(x, y) {
       const link = el.link;
       if (
         el.type === 600 &&
-        link?.destPath?.startsWith('supertask://task/') &&
+        taskIdFromLink(link?.destPath) &&
         link.width > 0 && link.height > 0
       ) {
         links.push({
-          taskId: link.destPath.replace('supertask://task/', ''),
+          taskId: taskIdFromLink(link.destPath),
           left: link.X,
           top: link.Y,
           right: link.X + link.width,
@@ -800,7 +801,7 @@ async function handlePenLassoAssist() {
     log('Gesture', `PEN-LASSO-ASSIST: lasso active at l=${rect.left} t=${rect.top} r=${rect.right} b=${rect.bottom} -- opening QuickAdd`);
 
     // Open QuickAdd -- it will call getLassoElements() itself
-    global.__superTaskDeepLink = {action: 'lasso-add'};
+    global.__superTodoistDeepLink = {action: 'lasso-add'};
     openPluginView();
   } catch (e) {
     log('Gesture', `handlePenLassoAssist error: ${e.message}`);
@@ -831,7 +832,7 @@ async function handleLongPress(x, y) {
     log('Gesture', `Matched task: ${taskId}`);
 
     // Set deep link and open the plugin UI
-    global.__superTaskDeepLink = {taskId, action: 'view-task'};
+    global.__superTodoistDeepLink = {taskId, action: 'view-task'};
     openPluginView();
 
   } catch (e) {
@@ -880,7 +881,7 @@ async function handleLassoAdd(bbox, downX, downY) {
     }
 
     // Open plugin to QuickAdd (same screen as lasso toolbar button 200)
-    global.__superTaskDeepLink = {action: 'lasso-add'};
+    global.__superTodoistDeepLink = {action: 'lasso-add'};
     openPluginView();
   } catch (e) {
     log('Gesture', `handleLassoAdd error: ${e.message}`);
@@ -901,21 +902,21 @@ async function openPluginView() {
   try {
     // If App is already mounted, navigate directly via the exposed callback.
     // This handles the re-show case where getInitialScreen() won't re-run.
-    const deepLink = global.__superTaskDeepLink;
-    if (deepLink && global.__superTaskNavigate) {
-      global.__superTaskDeepLink = null;
-      log('Gesture', `Navigating via __superTaskNavigate: ${deepLink.action} taskId=${deepLink.taskId}`);
+    const deepLink = global.__superTodoistDeepLink;
+    if (deepLink && global.__superTodoistNavigate) {
+      global.__superTodoistDeepLink = null;
+      log('Gesture', `Navigating via __superTodoistNavigate: ${deepLink.action} taskId=${deepLink.taskId}`);
       if (deepLink.action === 'view-task' && deepLink.taskId) {
-        global.__superTaskNavigate('deep-link-loading', {taskId: deepLink.taskId});
+        global.__superTodoistNavigate('deep-link-loading', {taskId: deepLink.taskId});
       } else if (deepLink.action === 'lasso-add') {
-        global.__superTaskNavigate('capture-lasso');
+        global.__superTodoistNavigate('capture-lasso');
       } else if (deepLink.action === 'view-project' && deepLink.projectId) {
-        global.__superTaskNavigate('project-view', {
+        global.__superTodoistNavigate('project-view', {
           projectId: deepLink.projectId,
           projectName: deepLink.projectName || 'Project',
         });
       } else if (deepLink.action === 'this-page') {
-        global.__superTaskNavigate('task-home', {focusTab: deepLink.focusTab || 'today'});
+        global.__superTodoistNavigate('task-home', {focusTab: deepLink.focusTab || 'today'});
       }
     }
     // If App isn't mounted yet, getInitialScreen() reads the global on mount.

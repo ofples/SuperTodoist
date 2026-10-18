@@ -1,5 +1,5 @@
 /**
- * NoteOpener -- note/page/document navigation.
+ * SuperTodoistNoteOpener -- note/page/document navigation.
  *
  * SDK 0.1.65 (SNDEV-70 build 1): native PluginFileAPI.openFile and
  * PluginCommAPI.jumpToPage are the primary path, with the Android-intent
@@ -24,7 +24,7 @@ import {loadConfig} from './config';
 import {log, logError} from './debug';
 import {markViewClosed} from './viewState';
 
-const {NoteOpener} = NativeModules;
+const {SuperTodoistNoteOpener} = NativeModules;
 
 async function nativeGateOn() {
   try {
@@ -60,12 +60,12 @@ export async function openNote(path, page = 0) {
   // intent paths.
   try {
     const exists = await RNFS.exists(path);
-    log('NoteOpener', `pre-flight exists=${exists} for ${path}`);
+    log('SuperTodoistNoteOpener', `pre-flight exists=${exists} for ${path}`);
     if (!exists) {
       return {success: false, error: `Note not found on device: ${path}`};
     }
   } catch (e) {
-    log('NoteOpener', `pre-flight exists() failed (proceeding anyway): ${e.message}`);
+    log('SuperTodoistNoteOpener', `pre-flight exists() failed (proceeding anyway): ${e.message}`);
   }
 
   // Native path (0.1.65+)
@@ -73,28 +73,28 @@ export async function openNote(path, page = 0) {
     try {
       const nativePage = page > 0 ? page - 1 : -1;
       const res = await PluginFileAPI.openFile(path, nativePage);
-      log('NoteOpener', `openFile(native) page=${nativePage} -> ${JSON.stringify(res)}`);
+      log('SuperTodoistNoteOpener', `openFile(native) page=${nativePage} -> ${JSON.stringify(res)}`);
       if (apiOk(res)) {
         closeViewSoon();
         return {success: true, via: 'openFile'};
       }
-      log('NoteOpener', 'openFile(native) unsuccessful -- falling back to intent');
+      log('SuperTodoistNoteOpener', 'openFile(native) unsuccessful -- falling back to intent');
     } catch (e) {
-      log('NoteOpener', `openFile(native) threw (${e.message}) -- falling back to intent`);
+      log('SuperTodoistNoteOpener', `openFile(native) threw (${e.message}) -- falling back to intent`);
     }
   }
 
   // Intent fallback (former primary; still required on pre-0.1.65 firmware)
-  if (!NoteOpener) {
-    return {success: false, error: 'openFile unavailable and NoteOpener native module missing'};
+  if (!SuperTodoistNoteOpener) {
+    return {success: false, error: 'openFile unavailable and SuperTodoistNoteOpener native module missing'};
   }
   try {
-    log('NoteOpener', `openNote(intent) path=${path} page=${page}`);
-    await NoteOpener.openNote(path, page);
+    log('SuperTodoistNoteOpener', `openNote(intent) path=${path} page=${page}`);
+    await SuperTodoistNoteOpener.openNote(path, page);
     closeViewSoon();
     return {success: true, via: 'intent'};
   } catch (e) {
-    logError('NoteOpener', e);
+    logError('SuperTodoistNoteOpener', e);
     return {success: false, error: e.message};
   }
 }
@@ -112,14 +112,14 @@ export async function jumpWithinNote(page0) {
   }
   try {
     const res = await PluginCommAPI.jumpToPage(page0);
-    log('NoteOpener', `jumpToPage(${page0}) -> ${JSON.stringify(res)}`);
+    log('SuperTodoistNoteOpener', `jumpToPage(${page0}) -> ${JSON.stringify(res)}`);
     if (apiOk(res)) {
       closeViewSoon();
       return {success: true, via: 'jumpToPage'};
     }
     return {success: false, error: `jumpToPage failed: ${JSON.stringify(res?.error ?? res)}`};
   } catch (e) {
-    logError('NoteOpener', e);
+    logError('SuperTodoistNoteOpener', e);
     return {success: false, error: e.message};
   }
 }
@@ -132,16 +132,16 @@ export async function jumpWithinNote(page0) {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function openFolder(folderPath) {
-  if (!NoteOpener) {
-    return {success: false, error: 'NoteOpener native module not available'};
+  if (!SuperTodoistNoteOpener) {
+    return {success: false, error: 'SuperTodoistNoteOpener native module not available'};
   }
   try {
-    log('NoteOpener', `openFolder path=${folderPath}`);
-    await NoteOpener.openFolder(folderPath);
+    log('SuperTodoistNoteOpener', `openFolder path=${folderPath}`);
+    await SuperTodoistNoteOpener.openFolder(folderPath);
     closeViewSoon();
     return {success: true};
   } catch (e) {
-    logError('NoteOpener', e);
+    logError('SuperTodoistNoteOpener', e);
     return {success: false, error: e.message};
   }
 }
@@ -159,26 +159,26 @@ export async function openDocument(path, page = 0) {
     try {
       const nativePage = page > 0 ? page - 1 : -1;
       const res = await PluginFileAPI.openFile(path, nativePage);
-      log('NoteOpener', `openFile(native,doc) page=${nativePage} -> ${JSON.stringify(res)}`);
+      log('SuperTodoistNoteOpener', `openFile(native,doc) page=${nativePage} -> ${JSON.stringify(res)}`);
       if (apiOk(res)) {
         closeViewSoon();
         return {success: true, via: 'openFile'};
       }
-      log('NoteOpener', 'openFile(native,doc) unsuccessful -- falling back to intent');
+      log('SuperTodoistNoteOpener', 'openFile(native,doc) unsuccessful -- falling back to intent');
     } catch (e) {
-      log('NoteOpener', `openFile(native,doc) threw (${e.message}) -- falling back to intent`);
+      log('SuperTodoistNoteOpener', `openFile(native,doc) threw (${e.message}) -- falling back to intent`);
     }
   }
-  if (!NoteOpener) {
-    return {success: false, error: 'openFile unavailable and NoteOpener native module missing'};
+  if (!SuperTodoistNoteOpener) {
+    return {success: false, error: 'openFile unavailable and SuperTodoistNoteOpener native module missing'};
   }
   try {
-    log('NoteOpener', `openDocument(intent) path=${path} page=${page}`);
-    await NoteOpener.openDocument(path, page);
+    log('SuperTodoistNoteOpener', `openDocument(intent) path=${path} page=${page}`);
+    await SuperTodoistNoteOpener.openDocument(path, page);
     closeViewSoon();
     return {success: true};
   } catch (e) {
-    logError('NoteOpener', e);
+    logError('SuperTodoistNoteOpener', e);
     return {success: false, error: e.message};
   }
 }

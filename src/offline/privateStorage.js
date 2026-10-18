@@ -4,7 +4,7 @@ let prepared = null;
 export async function privateStorage() {
   if (!prepared) {
     prepared = (async () => {
-      const storage = NativeModules.TaskStorage;
+      const storage = NativeModules.SuperTodoistStorage;
       if (!storage) throw new Error('Install the complete updated SuperTodoist package to enable private storage.');
       const path = await PluginManager.getPluginDirPath();
       if (!path) throw new Error('PluginHost did not provide private storage.');

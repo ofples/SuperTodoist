@@ -18,7 +18,7 @@ function harness() {
       h.disks.set(key, next); h.commits.push(key); if (h.commitHook) {await h.commitHook();}
     },
   };
-  const mocks = {'react-native': {NativeModules: {TaskStorage: storage}}, 'sn-plugin-lib': {PluginManager: {getPluginDirPath: async () => '/private/synthetic'}},
+  const mocks = {'react-native': {NativeModules: {SuperTodoistStorage: storage}}, 'sn-plugin-lib': {PluginManager: {getPluginDirPath: async () => '/private/synthetic'}},
     '../utils/config': {loadConfig: async () => ({apiToken: h.token}), getCachedConfig: () => ({apiToken: h.token})},
     '../utils/permissions': {ensurePermissionGroup: async () => false}, '../utils/debug': {log() {}}};
   const filename = path.resolve(__dirname, '../src/offline/service.js'), mod = new Module(filename, module);
