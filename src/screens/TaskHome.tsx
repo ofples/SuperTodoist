@@ -36,6 +36,7 @@ const {isUpcomingThisWeek} = require('../workspace/upcoming');
 const {collectionGroups} = require('../collections/model');
 const {localDate} = require('../offline/model');
 const {splitTitleDescription} = require('../batch/descriptionParser');
+const {taskIdFromLink} = require('../utils/taskIdentity');
 import {log, logError} from '../utils/debug';
 import TaskSidebar from '../components/NativeTaskSidebar';
 import {HeaderActionButtons, WorkspaceSidebarToggle, WorkspaceViewControls} from '../components/WorkspaceActionButtons';
@@ -372,8 +373,8 @@ export default function TaskHome({nav, focusTab, initialView, active = true}: Pr
     PluginFileAPI.getElements(pageNum, filePath).then((response: any) => {
       try {
         if (!cancelled && response?.success && response.result) {
-          const ids = response.result.filter((element: any) => element.type === 600 && element.link?.destPath?.startsWith('supertask://task/'))
-            .map((element: any) => element.link.destPath.replace('supertask://task/', ''));
+          const ids = response.result.filter((element: any) => element.type === 600 && taskIdFromLink(element.link?.destPath))
+            .map((element: any) => taskIdFromLink(element.link.destPath));
           setPageTaskIds(previous => JSON.stringify(previous) === JSON.stringify(ids) ? previous : ids);
         }
       } finally {response?.result?.forEach((element: any) => element.recycle?.());}
@@ -639,7 +640,7 @@ export default function TaskHome({nav, focusTab, initialView, active = true}: Pr
 
   // Tasks linked to the current NOTE (any page), each with the page it lives
   // on so the band tells you where you'd jump in a long note (design-home-v2).
-  // Sources: supertask:// links scanned on the current page, description
+  // Sources: current or legacy task links scanned on the current page, description
   // back-references (page parsed from "<fileName> p.N"), then registry
   // entries (which carry pageNum and cover not-yet-synced tasks).
   const noteTasks = (() => {
@@ -651,7 +652,7 @@ export default function TaskHome({nav, focusTab, initialView, active = true}: Pr
       }
     }
 
-    // 1. Tasks whose IDs were found as supertask:// links on the current page
+    // 1. Tasks whose IDs were found in task links on the current page
     for (const id of pageTaskIds) {
       const match = tasks.find(t => t.id === id);
       if (match && !seen.has(match.id)) {

@@ -31,9 +31,9 @@ import {setConfigLoader, getTask as getApiTask, getProjects} from './src/api/tod
 import {KeyboardAvoidanceViewport} from './src/components/KeyboardAvoidance';
 
 declare global {
-  var __superTaskButtonId: number | string | null;
-  var __superTaskDeepLink: {action: string; taskId?: string; projectId?: string; projectName?: string; focusTab?: string} | null;
-  var __superTaskNavigate: ((screen: string, params?: Record<string, any>) => void) | null;
+  var __superTodoistButtonId: number | string | null;
+  var __superTodoistDeepLink: {action: string; taskId?: string; projectId?: string; projectName?: string; focusTab?: string} | null;
+  var __superTodoistNavigate: ((screen: string, params?: Record<string, any>) => void) | null;
 }
 
 type ScreenEntry = {
@@ -45,9 +45,9 @@ type ScreenEntry = {
 // Read the initial button ID set by index.js before React mounted
 function getInitialScreen(): ScreenEntry {
   // Check for deep link from gesture detector
-  const deepLink = global.__superTaskDeepLink;
+  const deepLink = global.__superTodoistDeepLink;
   if (deepLink) {
-    global.__superTaskDeepLink = null; // Consume it
+    global.__superTodoistDeepLink = null; // Consume it
     if (deepLink.action === 'view-task' && deepLink.taskId) {
       return {name: 'deep-link-loading', params: {taskId: deepLink.taskId}, id: 0};
     }
@@ -62,8 +62,8 @@ function getInitialScreen(): ScreenEntry {
     }
   }
 
-  const raw = global.__superTaskButtonId;
-  (global as any).__superTaskButtonId = null; // Consume it -- a stale ID (e.g. 200 from
+  const raw = global.__superTodoistButtonId;
+  (global as any).__superTodoistButtonId = null; // Consume it -- a stale ID (e.g. 200 from
   // a past lasso capture) must not route a later context re-creation to capture-lasso
   // Coerce to number for comparison -- SDK may pass string or number
   const buttonId = typeof raw === 'string' ? parseInt(raw, 10) || raw : raw;
@@ -183,7 +183,7 @@ function App(): React.JSX.Element {
       if (config.debugMode) setDebugMode(true);
     }).catch((failure: any) => setError(failure.message));
 
-    const initial = global.__superTaskButtonId;
+    const initial = global.__superTodoistButtonId;
     log('App', `MOUNT -- initial buttonId=${JSON.stringify(initial)} screen=${initialScreenName}`);
     markViewOpen('app-mount'); // App only mounts with the view showing (B-031 tracking)
 
@@ -195,8 +195,8 @@ function App(): React.JSX.Element {
     // Expose a navigate callback so the gesture detector can route
     // directly when the App is already mounted (re-show via showPluginView).
     // For first-mount, getInitialScreen() reads the global instead.
-    global.__superTaskNavigate = (screen: string, params?: Record<string, any>) => {
-      log('App', `__superTaskNavigate: ${screen} params=${params ? Object.keys(params).join(',') : 'none'}`);
+    global.__superTodoistNavigate = (screen: string, params?: Record<string, any>) => {
+      log('App', `__superTodoistNavigate: ${screen} params=${params ? Object.keys(params).join(',') : 'none'}`);
       resetToRef.current?.(screen, params);
     };
 
@@ -230,7 +230,7 @@ function App(): React.JSX.Element {
     return () => {
       log('App', 'UNMOUNT -- removing listeners');
       markViewClosed('app-unmount');
-      global.__superTaskNavigate = null;
+      global.__superTodoistNavigate = null;
       if (configSub?.remove) configSub.remove();
       if (buttonSub?.remove) buttonSub.remove();
     };

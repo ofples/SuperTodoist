@@ -186,9 +186,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.supertask"
+    namespace "com.supertodoist"
     defaultConfig {
-        applicationId "com.supertask"
+        applicationId "com.supertodoist"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

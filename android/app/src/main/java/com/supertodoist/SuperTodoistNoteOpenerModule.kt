@@ -1,4 +1,4 @@
-package com.supertask
+package com.supertodoist
 
 import android.content.ComponentName
 import android.content.Intent
@@ -20,13 +20,13 @@ import com.facebook.react.bridge.ReactMethod
  *
  * See docs/design-native-intents.md for full rationale.
  */
-class NoteOpenerModule(reactContext: ReactApplicationContext) :
+class SuperTodoistNoteOpenerModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
 
-    override fun getName(): String = "NoteOpener"
+    override fun getName(): String = "SuperTodoistNoteOpener"
 
     companion object {
-        private const val TAG = "NoteOpener"
+        private const val TAG = "SuperTodoistNoteOpener"
     }
 
     /**

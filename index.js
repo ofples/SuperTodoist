@@ -85,11 +85,11 @@ PluginManager.registerButton(1, ['DOC'], {
 // Set initial button ID BEFORE React mounts.
 // The config event fires before App.tsx useEffect, so we need
 // to capture it here. App.tsx reads this global on mount.
-global.__superTaskButtonId = null;
+global.__superTodoistButtonId = null;
 
 PluginManager.registerButtonListener({
   onButtonPress: (msg) => {
-    global.__superTaskButtonId = msg.id;
+    global.__superTodoistButtonId = msg.id;
     markViewOpen('button'); // showType 1 buttons open the full-screen view (B-031 tracking)
   },
 });
@@ -97,7 +97,7 @@ PluginManager.registerButtonListener({
 // SDK 0.1.65 exposes onClick for the config button.
 PluginManager.registerConfigButtonListener({
   onClick: () => {
-    global.__superTaskButtonId = 'config';
+    global.__superTodoistButtonId = 'config';
     markViewOpen('config-button');
   },
 });

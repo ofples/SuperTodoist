@@ -81,13 +81,13 @@ async function fixture(initial = {}) {
     './src/utils/viewState': {markViewOpen() {}, markViewClosed() {}, setCurrentScreen() {}},
     './src/utils/taskRegistry': {getTask: async () => null}, './src/api/todoist': api,
   }).default;
-  global.__superTaskButtonId = null; global.__superTaskDeepLink = initial.deepLink || null;
+  global.__superTodoistButtonId = null; global.__superTodoistDeepLink = initial.deepLink || null;
   let tree;
   await act(async () => {tree = create(React.createElement(App)); await flush();});
   return {tree, calls, Batch, Single,
     stallNextConfigRead() {let resolve; const promise = new Promise(done => {resolve = done;}); configReads.push(promise); return resolve;},
     async tap(label) {const button = byLabel(tree, label); assert.ok(button, `missing ${label}`); await act(async () => {await button.props.onPress(); await flush();});},
-    async navigate(name, params) {await act(async () => {global.__superTaskNavigate(name, params); await flush();});},
+    async navigate(name, params) {await act(async () => {global.__superTodoistNavigate(name, params); await flush();});},
     async dispose() {await act(async () => {tree.unmount(); await flush();});},
   };
 }

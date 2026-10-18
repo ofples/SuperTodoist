@@ -1,6 +1,4 @@
-/** Settings and credentials are private. Shared legacy settings are read only for migration. */
-import RNFS from 'react-native-fs';
-import {PluginManager} from 'sn-plugin-lib';
+/** Settings and credentials are private to this plugin identity. */
 import {privateStorage} from '../offline/privateStorage';
 import {log, setDebugServerUrl} from './debug';
 import {setFontScale, normalizeFontScale} from './fontScale';
@@ -56,33 +54,14 @@ const DEFAULT_CONFIG = {
   // B-033: one-shot native view invalidate after TaskHome's first content
   // paint, to clear the note ghost left by the partial refresh on open.
   // Device-confirmed 2026-09-06 (no visible cost), so there is no UI row --
-  // this is a hidden kill switch, editable in supertask-config.json over USB.
+  // this is a hidden kill switch, editable in the private settings JSON.
   refreshOnOpen: true,
 };
 
-const LEGACY_FILE = '/storage/emulated/0/MyStyle/SuperTask/supertask-config.json';
-const LEGACY_KEY = 'sntask_v1_8f3a2c9d7e1b';
 let _runtimeConfig = null;
 let _configSource = 'defaults';
 let _loadPromise = null;
 let _saveChain = Promise.resolve();
-
-function decodeLegacy(value) {
-  if (typeof value !== 'string' || !value.startsWith('xor1:')) return value;
-  const bytes = global.atob(value.slice(5));
-  return Array.from(bytes).map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ LEGACY_KEY.charCodeAt(i % LEGACY_KEY.length))).join('');
-}
-
-async function readLegacy() {
-  if (await PluginManager.hasPermission('plugin.permission.FILE:READ') !== 1) return null;
-  if (!(await RNFS.exists(LEGACY_FILE))) return null;
-  const value = JSON.parse(await RNFS.readFile(LEGACY_FILE, 'utf8'));
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Legacy settings are damaged. Import your token in Settings.');
-  value.apiToken = decodeLegacy(value.apiToken) || '';
-  value.debugServerUrl = decodeLegacy(value.debugServerUrl) || '';
-  if (value.apiToken === 'YOUR_TOKEN_HERE') value.apiToken = '';
-  return value;
-}
 
 export async function loadConfig() {
   if (_runtimeConfig) return withDerived({...DEFAULT_CONFIG, ..._runtimeConfig});
@@ -96,28 +75,8 @@ export async function loadConfig() {
       _runtimeConfig = value;
       _configSource = 'private';
     } else {
-      const legacy = await readLegacy();
-      const value = {...DEFAULT_CONFIG, ...(legacy || {})};
-      if (legacy) {
-        value.privacyWarning = 'Legacy settings were migrated. A prior shared copy may have been cloud-synced; rotate your token if needed.';
-        // Commit privately FIRST. A failed save leaves legacy settings intact.
-        await storage.saveSettings(JSON.stringify(value));
-        if (await PluginManager.hasPermission('plugin.permission.FILE:WRITE') === 1) {
-          try {
-            const redacted = {...legacy, apiToken: '', debugServerUrl: ''};
-            await RNFS.writeFile(LEGACY_FILE + '.tmp', JSON.stringify(redacted), 'utf8');
-            await RNFS.moveFile(LEGACY_FILE + '.tmp', LEGACY_FILE);
-          } catch {
-            value.privacyWarning += ' The shared settings copy could not be redacted; remove its token manually.';
-            await storage.saveSettings(JSON.stringify(value));
-          }
-        } else {
-          value.privacyWarning += ' Allow shared-folder access and remove the old token from MyStyle/SuperTask/supertask-config.json.';
-          await storage.saveSettings(JSON.stringify(value));
-        }
-      }
-      _runtimeConfig = value;
-      _configSource = legacy ? 'private' : 'defaults';
+      _runtimeConfig = {...DEFAULT_CONFIG};
+      _configSource = 'defaults';
     }
     return withDerived({...DEFAULT_CONFIG, ..._runtimeConfig});
   })().finally(() => { _loadPromise = null; });

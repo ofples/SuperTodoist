@@ -23,6 +23,7 @@ import {useLocations} from '../collections/useLocations';
 import DatePicker from '../components/DatePicker';
 import {useFontScale} from '../utils/useFontScale';
 import {clampRectToPage} from '../utils/rectUtils';
+const {createTaskLink, createNoteReference} = require('../utils/taskIdentity');
 
 type Nav = {
   push: (name: string, params?: Record<string, any>) => void;
@@ -125,7 +126,7 @@ export default function TaskAdd({nav, projects: initialProjects, defaultProjectI
       // Build description with note context back-reference
       let fullDescription = description.trim();
       if (captureMode === 'lasso' && noteContext) {
-        const noteRef = `\n\n---\n[SuperTask] Captured from: ${noteContext.filePath} p.${noteContext.pageNum}`;
+        const noteRef = createNoteReference(noteContext.filePath, noteContext.pageNum);
         fullDescription = fullDescription ? fullDescription + noteRef : noteRef.trim();
       }
 
@@ -150,7 +151,7 @@ export default function TaskAdd({nav, projects: initialProjects, defaultProjectI
       if (captureMode === 'lasso' && noteContext) {
         try {
           setStatus('Marking task...');
-          const destPath = `supertask://task/${task?.id}`;
+        const destPath = createTaskLink(task?.id);
           log('TaskAdd', `setLassoStrokeLink: destPath=${destPath}`);
           const markResult = await withTimeout(PluginNoteAPI.setLassoStrokeLink({
             destPath,
@@ -269,7 +270,7 @@ export default function TaskAdd({nav, projects: initialProjects, defaultProjectI
         right: bounds.left + textWidth,
         bottom: bounds.top + textHeight,
       };
-      const destPath = `supertask://task/${createdTask?.id}`;
+      const destPath = createTaskLink(createdTask?.id);
       log('TaskAdd', `insertTextLink: l=${textRect.left} t=${textRect.top} fontSize=${fontSize} dest=${destPath}`);
       const linkResult = await withTimeout(PluginNoteAPI.insertTextLink({
         destPath,

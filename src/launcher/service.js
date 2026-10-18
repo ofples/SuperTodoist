@@ -7,7 +7,7 @@ import {
 } from '../utils/config';
 import {log} from '../utils/debug';
 
-const bridge = NativeModules.TaskLauncher;
+const bridge = NativeModules.SuperTodoistLauncher;
 let initialized = false;
 let viewOpen = false;
 let revision = 0;
@@ -97,31 +97,31 @@ export function initLauncher() {
   }
   initialized = true;
   subscriptions.push(
-    DeviceEventEmitter.addListener('SuperTaskLauncherTap', async event => {
+    DeviceEventEmitter.addListener('SuperTodoistLauncherTap', async event => {
       // Native opens the view once, waking React; do not open it again here.
       require('../utils/viewState').markViewOpen('edge-launcher');
       if (event?.route === 'settings') {
-        global.__superTaskButtonId = 'config';
-        global.__superTaskDeepLink = null;
-        if (global.__superTaskNavigate) {
-          global.__superTaskButtonId = null;
-          global.__superTaskNavigate('config');
+        global.__superTodoistButtonId = 'config';
+        global.__superTodoistDeepLink = null;
+        if (global.__superTodoistNavigate) {
+          global.__superTodoistButtonId = null;
+          global.__superTodoistNavigate('config');
         }
         return;
       }
       const config = getCachedConfig() || (await loadConfig());
       const focusTab = resolveDefaultTab(config);
-      global.__superTaskButtonId = null;
-      global.__superTaskDeepLink = {action: 'this-page', focusTab};
-      if (global.__superTaskNavigate) {
-        global.__superTaskDeepLink = null;
-        global.__superTaskNavigate('task-home', {focusTab});
+      global.__superTodoistButtonId = null;
+      global.__superTodoistDeepLink = {action: 'this-page', focusTab};
+      if (global.__superTodoistNavigate) {
+        global.__superTodoistDeepLink = null;
+        global.__superTodoistNavigate('task-home', {focusTab});
       }
     }),
   );
   subscriptions.push(
     DeviceEventEmitter.addListener(
-      'SuperTaskLauncherPosition',
+      'SuperTodoistLauncherPosition',
       async position => {
         const ok = await saveConfig({
           launcherEdge: position.edge,
@@ -138,19 +138,19 @@ export function initLauncher() {
     ),
   );
   subscriptions.push(
-    DeviceEventEmitter.addListener('SuperTaskLauncherError', event => {
+    DeviceEventEmitter.addListener('SuperTodoistLauncherError', event => {
       log('Launcher', event.message || 'Launcher unavailable');
       // A rejected native launch never opened/marked our UI. Leave any newer
       // toolbar-opened view's lifecycle state intact.
     }),
   );
   subscriptions.push(
-    DeviceEventEmitter.addListener('SuperTaskLauncherResume', () =>
+    DeviceEventEmitter.addListener('SuperTodoistLauncherResume', () =>
       reloadLauncher().catch(() => {}),
     ),
   );
   subscriptions.push(
-    DeviceEventEmitter.addListener('SuperTaskLauncherHide', () =>
+    DeviceEventEmitter.addListener('SuperTodoistLauncherHide', () =>
       reloadLauncher().catch(() => {}),
     ),
   );

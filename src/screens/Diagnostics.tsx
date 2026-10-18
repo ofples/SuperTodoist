@@ -18,6 +18,7 @@ import {
 import {closePlugin} from '../utils/closePlugin';
 import {log} from '../utils/debug';
 import {openNote} from '../utils/noteOpener';
+const {taskIdFromLink} = require('../utils/taskIdentity');
 
 type Props = {
   nav: {pop: () => void};
@@ -250,7 +251,7 @@ export default function Diagnostics({nav}: Props) {
     const templateName = typeof t === 'string' ? t : t?.name;
     const templateHUri = t?.hUri;
     const templateVUri = t?.vUri;
-    const testPath = basePath ? `${basePath}Note/_supertask_diag.note` : '/storage/emulated/0/Note/_supertask_diag.note';
+    const testPath = basePath ? `${basePath}Note/_supertodoist_diag.note` : '/storage/emulated/0/Note/_supertodoist_diag.note';
 
     // Try with template name first (docs say pass Template.name)
     const attempts = [
@@ -491,12 +492,12 @@ export default function Diagnostics({nav}: Props) {
       }
       const elements = elemResult.result || [];
       const links = elements.filter((el: any) => el.type === 600);
-      const stLinks = links.filter((el: any) => el.link?.destPath?.startsWith('supertask://'));
+      const stLinks = links.filter((el: any) => taskIdFromLink(el.link?.destPath));
       const details = links.map((el: any) => {
         const l = el.link || {};
         return `cat=${l.category} X=${l.X} Y=${l.Y} w=${l.width} h=${l.height} dest=${(l.destPath || '').slice(0, 40)} ctrl=[${(l.controlTrailNums || []).join(',')}]`;
       });
-      const msg = `${links.length} links (${stLinks.length} SuperTodoist task links):\n${details.join('\n') || '(none)'}`;
+      const msg = `${links.length} links (${stLinks.length} SuperTodoist task links, including legacy links):\n${details.join('\n') || '(none)'}`;
       log('NavTest', msg);
       setNavResult(`Element bounds:\n${msg}`);
 
@@ -624,7 +625,7 @@ export default function Diagnostics({nav}: Props) {
         {navResult ? (
           <Text style={styles.navResult}>{navResult}</Text>
         ) : (
-          <Text style={styles.navHint}>Test APIs for opening notes. Open a note with supertask links first.</Text>
+          <Text style={styles.navHint}>Test APIs for opening notes. Open a note with SuperTodoist task links first.</Text>
         )}
         <Text style={[styles.navTitle, {marginTop: 8}]}>Intent Navigation (closes plugin)</Text>
         <View style={styles.navButtons}>

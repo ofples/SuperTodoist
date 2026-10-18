@@ -45,7 +45,7 @@ function fixture({pending = false, failSave = false} = {}) {
   };
   const mocks = {
     'react-native': {
-      NativeModules: {TaskLauncher: native},
+      NativeModules: {SuperTodoistLauncher: native},
       DeviceEventEmitter: {
         addListener(name, callback) {
           assert.equal(listeners.has(name), false);
@@ -77,9 +77,9 @@ function fixture({pending = false, failSave = false} = {}) {
     }).outputText,
     filename,
   );
-  global.__superTaskDeepLink = {action: 'lasso-add'};
-  global.__superTaskButtonId = 200;
-  global.__superTaskNavigate = (...args) => navigation.push(args);
+  global.__superTodoistDeepLink = {action: 'lasso-add'};
+  global.__superTodoistButtonId = 200;
+  global.__superTodoistNavigate = (...args) => navigation.push(args);
   return {
     service: loaded.exports,
     listeners,
@@ -99,10 +99,10 @@ test('accepted Settings event routes the mounted app without calling showPluginV
   const f = fixture();
   f.service.initLauncher();
   await f.service.reloadLauncher();
-  await f.listeners.get('SuperTaskLauncherTap')({route: 'settings'});
+  await f.listeners.get('SuperTodoistLauncherTap')({route: 'settings'});
   assert.deepEqual(f.navigation, [['config']]);
-  assert.equal(global.__superTaskDeepLink, null);
-  assert.equal(global.__superTaskButtonId, null);
+  assert.equal(global.__superTodoistDeepLink, null);
+  assert.equal(global.__superTodoistButtonId, null);
   assert.deepEqual(f.marks, [['open', 'edge-launcher']]);
   f.service.initLauncher(); // No duplicate listener registration.
 });
@@ -110,16 +110,16 @@ test('Settings before App mount replaces a stale lasso route with the existing c
   const f = fixture();
   f.service.initLauncher();
   await f.service.reloadLauncher();
-  global.__superTaskNavigate = null;
-  await f.listeners.get('SuperTaskLauncherTap')({route: 'settings'});
-  assert.equal(global.__superTaskButtonId, 'config');
-  assert.equal(global.__superTaskDeepLink, null);
+  global.__superTodoistNavigate = null;
+  await f.listeners.get('SuperTodoistLauncherTap')({route: 'settings'});
+  assert.equal(global.__superTodoistButtonId, 'config');
+  assert.equal(global.__superTodoistDeepLink, null);
 });
 test('ordinary accepted tap still routes the configured task tab', async () => {
   const f = fixture();
   f.service.initLauncher();
   await f.service.reloadLauncher();
-  await f.listeners.get('SuperTaskLauncherTap')({route: 'tasks'});
+  await f.listeners.get('SuperTodoistLauncherTap')({route: 'tasks'});
   assert.deepEqual(f.navigation, [['task-home', {focusTab: 'today'}]]);
 });
 test('native quick Hide commits disabled privately before acknowledging the pending marker', async () => {
@@ -128,7 +128,7 @@ test('native quick Hide commits disabled privately before acknowledging the pend
   await f.service.reloadLauncher();
   f.calls.length = 0;
   f.hideNative();
-  await f.listeners.get('SuperTaskLauncherHide')();
+  await f.listeners.get('SuperTodoistLauncherHide')();
   assert.equal(f.config().launcherEnabled, false);
   assert.equal(f.pending(), false);
   assert.ok(
@@ -140,7 +140,7 @@ test('native quick Hide commits disabled privately before acknowledging the pend
 test('paused/restarted React replays the native Hide marker on resume without a lost event', async () => {
   const f = fixture({pending: true});
   f.service.initLauncher();
-  await f.listeners.get('SuperTaskLauncherResume')();
+  await f.listeners.get('SuperTodoistLauncherResume')();
   assert.equal(f.config().launcherEnabled, false);
   assert.equal(f.pending(), false);
   assert.equal(
@@ -151,7 +151,7 @@ test('paused/restarted React replays the native Hide marker on resume without a 
 test('failed private save keeps native Hide pending; never acknowledges or reenables', async () => {
   const f = fixture({pending: true, failSave: true});
   f.service.initLauncher();
-  await f.listeners.get('SuperTaskLauncherResume')();
+  await f.listeners.get('SuperTodoistLauncherResume')();
   assert.equal(f.pending(), true);
   assert.equal(
     f.calls.some(c => c[0] === 'confirmHide' || c[0] === 'configure'),
@@ -175,7 +175,7 @@ test('native launch rejection does not route or close a newer toolbar-opened vie
   f.service.initLauncher();
   await f.service.reloadLauncher();
   f.service.launcherViewChanged(true);
-  f.listeners.get('SuperTaskLauncherError')({
+  f.listeners.get('SuperTodoistLauncherError')({
     message: 'Rejected',
     launchFailed: true,
   });

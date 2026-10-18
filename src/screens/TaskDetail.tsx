@@ -31,6 +31,7 @@ import {useLocations} from '../collections/useLocations';
 import DatePicker from '../components/DatePicker';
 import {useFontScale} from '../utils/useFontScale';
 import {retryOffline} from '../offline/service';
+const {createNoteReference, parseNoteReference, stripNoteReference} = require('../utils/taskIdentity');
 
 type Nav = {
   push: (name: string, params?: Record<string, any>) => void;
@@ -45,19 +46,17 @@ type Props = {
   projects: any[];
 };
 
-// Parse note context from description: "[SuperTask] Captured from: {path} p.{N}"
+// Parse both the old and current SuperTodoist note reference tags.
 // Supports both full path (/storage/.../file.note) and legacy filename-only (file.note)
 function parseNoteContext(desc: string): {notePath: string; noteFile: string; pageNum: number; userDescription: string} | null {
-  if (!desc) return null;
-  const match = desc.match(/\[SuperTask\] Captured from: (.+\.note) p\.(\d+)/);
+  const match = parseNoteReference(desc);
   if (!match) return null;
-  const userDescription = desc.replace(/\n*---\n\[SuperTask\] Captured from: .+$/, '').trim();
-  const raw = match[1];
-  const isFullPath = raw.startsWith('/');
+  const userDescription = stripNoteReference(desc);
+  const raw = match.path;
   return {
-    notePath: isFullPath ? raw : '',  // empty = legacy, must resolve
+    notePath: match.fullPath ? raw : '',  // empty = legacy, must resolve
     noteFile: raw.split('/').pop() || raw,
-    pageNum: parseInt(match[2], 10),
+    pageNum: match.pageNum,
     userDescription,
   };
 }
@@ -150,7 +149,7 @@ export default function TaskDetail({nav, task, projects: initialProjects}: Props
       let fullDescription = description.trim();
       if (noteContext && !task.source) {
         const pathOrFile = noteContext.notePath || noteContext.noteFile;
-        const noteRef = `\n\n---\n[SuperTask] Captured from: ${pathOrFile} p.${noteContext.pageNum}`;
+        const noteRef = createNoteReference(pathOrFile, noteContext.pageNum);
         fullDescription = fullDescription ? fullDescription + noteRef : noteRef.trim();
       }
 
