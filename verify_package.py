@@ -37,7 +37,7 @@ with zipfile.ZipFile(artifact) as plugin:
         'org.linusu.RNGetRandomValuesPackage',
     }
     assert plugin.read(config['iconPath'].lstrip('/')).startswith(b'\x89PNG')
-    capture_icons = [name for name in names if 'capture-todoist' in name.lower() and name.lower().endswith('.png')]
+    capture_icons = [name for name in names if 'capturetodoist' in name.lower() and name.lower().endswith('.png')]
     assert capture_icons, 'Missing packaged Add to Todoist capture icon'
     for name in capture_icons:
         assert plugin.read(name).startswith(b'\x89PNG'), f'Invalid capture icon: {name}'
