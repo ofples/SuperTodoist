@@ -29,7 +29,7 @@ import {importTokenFromFile, findTokenFile, TOKEN_DIR_LABEL} from '../utils/toke
 import {PERMISSION_GROUPS, getPermissionStates, ensurePermissionGroup} from '../utils/permissions';
 import ProjectPicker from '../components/ProjectPicker';
 import AISettingsFields from '../components/AISettingsFields';
-const {normalizeAIModels} = require('../utils/aiModels');
+const {DEFAULT_AI_MODEL, normalizeAIModels} = require('../utils/aiModels');
 import LauncherSettings from '../launcher/LauncherSettings';
 const {isProjectVisible, toggleProjectVisibility} = require('../utils/projectVisibility');
 import {useLocations} from '../collections/useLocations';
@@ -131,8 +131,8 @@ export default function Config({nav, initialPage}: Props) {
   const [defaultProjectId, setDefaultProjectId] = useState<string | null>(cfg0?.defaultProjectId || null);
   const [defaultSectionId, setDefaultSectionId] = useState<string | null>(cfg0?.defaultSectionId || null);
   const [aiApiKey, setAiApiKey] = useState(cfg0?.aiApiKey || '');
-  const [aiModel, setAiModel] = useState(cfg0?.aiModel || 'gpt-4.1-mini');
-  const [aiModels, setAiModels] = useState<string[]>(() => normalizeAIModels(cfg0?.aiModels, cfg0?.aiModel || 'gpt-4.1-mini'));
+  const [aiModel, setAiModel] = useState(cfg0?.aiModel || DEFAULT_AI_MODEL);
+  const [aiModels, setAiModels] = useState<string[]>(() => normalizeAIModels(cfg0?.aiModels, cfg0?.aiModel || DEFAULT_AI_MODEL));
   const [aiByDefault, setAiByDefault] = useState(cfg0?.aiByDefault === true);
   const [aiSaving, setAiSaving] = useState(false);
   const [aiStatus, setAiStatus] = useState('');
@@ -193,8 +193,8 @@ export default function Config({nav, initialPage}: Props) {
       if (config.defaultProjectId) setDefaultProjectId(config.defaultProjectId);
       setDefaultSectionId(config.defaultSectionId || null);
       setAiApiKey(config.aiApiKey || '');
-      setAiModel(config.aiModel || 'gpt-4.1-mini');
-      setAiModels(normalizeAIModels(config.aiModels, config.aiModel || 'gpt-4.1-mini'));
+      setAiModel(config.aiModel || DEFAULT_AI_MODEL);
+      setAiModels(normalizeAIModels(config.aiModels, config.aiModel || DEFAULT_AI_MODEL));
       setAiByDefault(config.aiByDefault === true);
       setAiSetupHintDismissed(config.aiSetupHintDismissed === true);
       if (config.postCreateAction) setPostCreateAction(config.postCreateAction);
@@ -265,8 +265,8 @@ export default function Config({nav, initialPage}: Props) {
   const handleSaveAISettings = async () => {
     setAiSaving(true);
     setAiStatus('');
-    const models = normalizeAIModels(aiModels, aiModel.trim() || 'gpt-4.1-mini');
-    const ok = await applyChange('aiSettings', {aiApiKey: aiApiKey.trim(), aiModel: aiModel.trim() || 'gpt-4.1-mini', aiModels: models});
+    const models = normalizeAIModels(aiModels, aiModel.trim() || DEFAULT_AI_MODEL);
+    const ok = await applyChange('aiSettings', {aiApiKey: aiApiKey.trim(), aiModel: aiModel.trim() || DEFAULT_AI_MODEL, aiModels: models});
     setAiStatus(ok ? 'Saved privately on this device.' : 'Could not save settings.');
     setAiSaving(false);
   };
@@ -295,7 +295,7 @@ export default function Config({nav, initialPage}: Props) {
       const ok = await applyChange('aiSettings', changes);
       if (!ok) {
         const durable = getCachedConfig();
-        const savedModel = durable?.aiModel || 'gpt-4.1-mini';
+        const savedModel = durable?.aiModel || DEFAULT_AI_MODEL;
         setAiModels(normalizeAIModels(durable?.aiModels, savedModel));
         if (selectedModel !== undefined) setAiModel(savedModel);
       }

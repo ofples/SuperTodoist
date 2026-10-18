@@ -19,9 +19,15 @@ function compiled(file, overrides = {}) {
   return mod.exports;
 }
 const {providerFetch} = compiled('../src/batch/fetch.ts');
+const {DEFAULT_AI_MODEL} = require('../src/utils/aiModels');
 const {refineBatch, refinementError} = compiled('../src/batch/refine.ts', {
   './fetch': {providerFetch},
   '../utils/config': {loadConfig: async () => ({aiApiKey: 'test-only-key', aiModel: 'gpt-4.1-mini'})},
+  '../utils/permissions': {ensurePermissionGroup: async () => true},
+});
+const {refineBatch: refineWithDefaultModel} = compiled('../src/batch/refine.ts', {
+  './fetch': {providerFetch},
+  '../utils/config': {loadConfig: async () => ({aiApiKey: 'test-only-key'})},
   '../utils/permissions': {ensurePermissionGroup: async () => true},
 });
 const proposal = {tasks: [{content: 'Call Ofer', description: '', priority: 1, sectionId: null, projectId: null, dueDate: null, labels: [], explicitFields: [], sourceRowIds: ['1'], sourceText: 'Call Ofer'}]};
@@ -50,6 +56,21 @@ test('same Responses model path parses HTTP 200 buffered response and requests s
     assert.ok(requests[0].body.text.format.schema.properties.tasks.items.required.includes('sectionId'));
     assert.match(JSON.stringify(requests[0].body.input), /input_image/);
     assert.match(JSON.stringify(requests[0].body.input), /sourceText/);
+  } finally {global.fetch = originalFetch;}
+});
+test('refinement without a saved model uses the shared Luna default', async () => {
+  let request;
+  global.fetch = async (url, init) => {
+    request = JSON.parse(init.body);
+    return bufferedResponse(JSON.stringify({id: 'resp_default', object: 'response', created_at: 1,
+      model: DEFAULT_AI_MODEL, status: 'completed', output: [{id: 'msg_default', type: 'message', role: 'assistant',
+        status: 'completed', content: [{type: 'output_text', text: JSON.stringify(proposal), annotations: []}]}],
+      usage: {input_tokens: 20, output_tokens: 40, total_tokens: 60}, incomplete_details: null}));
+  };
+  try {
+    const rows = [{...proposal.tasks[0], rowId: 1, dueString: ''}];
+    await refineWithDefaultModel(rows, [], Date.now(), 'aGVsbG8=', new AbortController().signal);
+    assert.equal(request.model, DEFAULT_AI_MODEL);
   } finally {global.fetch = originalFetch;}
 });
 test('cancelled refinement never starts a request; provider failures hide raw response bodies', async () => {

@@ -4,6 +4,7 @@ import {PluginManager} from 'sn-plugin-lib';
 import {privateStorage} from '../offline/privateStorage';
 import {log, setDebugServerUrl} from './debug';
 import {setFontScale, normalizeFontScale} from './fontScale';
+const {DEFAULT_AI_MODEL, DEFAULT_AI_MODELS} = require('./aiModels');
 
 function withDerived(merged) {
   merged.fontScale = normalizeFontScale(merged.fontScale);
@@ -15,10 +16,10 @@ function withDerived(merged) {
 const DEFAULT_CONFIG = {
   apiToken: '',
   aiApiKey: '',
-  aiModel: 'gpt-4.1-mini',
+  aiModel: DEFAULT_AI_MODEL,
   // Explicit opt-in. Older configs inherit false and continue using device OCR.
   aiByDefault: false,
-  aiModels: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
+  aiModels: [...DEFAULT_AI_MODELS],
   privacyWarning: '',
   debugServerUrl: '',
   defaultProjectId: null,

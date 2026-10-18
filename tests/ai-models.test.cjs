@@ -1,6 +1,6 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const {DEFAULT_AI_MODELS, normalizeAIModels, addAIModel, removeAIModel} = require('../src/utils/aiModels');
+const {DEFAULT_AI_MODEL, DEFAULT_AI_MODELS, normalizeAIModels, addAIModel, removeAIModel} = require('../src/utils/aiModels');
 
 test('model list preserves supported examples, custom IDs, and legacy selected model', () => {
   assert.deepEqual(normalizeAIModels(['custom-model', 'gpt-4.1-mini'], 'old-saved-model'),
@@ -8,7 +8,10 @@ test('model list preserves supported examples, custom IDs, and legacy selected m
   assert.deepEqual(normalizeAIModels(undefined, 'old-saved-model'), [...DEFAULT_AI_MODELS, 'old-saved-model']);
   assert.deepEqual(normalizeAIModels([], 'old-saved-model'), ['old-saved-model']);
   assert.deepEqual(normalizeAIModels([], ''), []);
-  assert.deepEqual(DEFAULT_AI_MODELS, ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini']);
+  assert.equal(DEFAULT_AI_MODEL, 'gpt-6-luna');
+  assert.deepEqual(DEFAULT_AI_MODELS, ['gpt-6-luna', 'gpt-6.1-sol']);
+  assert.deepEqual(normalizeAIModels(['custom-model', 'gpt-4.1-mini'], 'gpt-4.1-mini'),
+    ['custom-model', 'gpt-4.1-mini']);
 });
 
 test('users can add arbitrary IDs and remove saved IDs without duplicates', () => {

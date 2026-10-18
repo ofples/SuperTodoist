@@ -41,7 +41,7 @@ test('AI by default reverts to saved value after a failed write and can be retri
     if (name === '../components/settings') return settings;
     if (name === '../collections/useLocations') return {useLocations: () => ({projects: [], sections: []})};
     if (name === '../utils/fontScale') return {FONT_SCALE_STEPS: [1], normalizeFontScale: value => value};
-    if (name === '../utils/aiModels') return {normalizeAIModels: (models, current) => models || [current]};
+    if (name === '../utils/aiModels') return {DEFAULT_AI_MODEL: 'gpt-6-luna', normalizeAIModels: (models, current) => models || [current]};
     if (name === '../utils/projectVisibility') return {isProjectVisible: () => true, toggleProjectVisibility: () => []};
     return normal(name);
   };

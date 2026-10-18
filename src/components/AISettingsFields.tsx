@@ -68,7 +68,7 @@ export default function AISettingsFields({apiKey, model, models, status = '', sa
         <Text style={s.label}>Add model</Text>
       </Pressable>
     </View>}
-    <Text style={s.body}>Examples: gpt-4.1-mini, gpt-4.1, gpt-4o-mini. You can add any model ID supported by your API account.</Text>
+    <Text style={s.body}>Included: gpt-6-luna (default) and gpt-6.1-sol. You can add any model ID supported by your API account.</Text>
     <Pressable accessibilityRole="button" accessibilityLabel="Save AI settings" accessibilityState={{disabled: saving}}
       style={[s.button, saving && s.disabled]} disabled={saving} onPress={onSave}>
       <Text style={s.label}>{saving ? 'Saving…' : 'Save settings'}</Text>

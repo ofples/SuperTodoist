@@ -45,7 +45,7 @@ A spaced dash such as `Call vet - ask about the new diet` splits into title `Cal
 
 ## Optional AI refinement
 
-AI is optional. Device OCR and manual review work without an OpenAI key. Add a separate OpenAI API key in **Settings → Setup → AI settings**, select one of the default models (`gpt-4.1-mini`, `gpt-4.1`, or `gpt-4o-mini`), or add a model ID supported by your OpenAI account. **AI by default** is off unless you turn it on.
+AI is optional. Device OCR and manual review work without an OpenAI key. For the next release, the included model choices will be `gpt-6-luna` (the default for new configurations) and `gpt-6.1-sol`. Existing saved model choices remain selected. Add a separate OpenAI API key in **Settings → Setup → AI settings**, or add another model ID supported by your OpenAI account. **AI by default** is off unless you turn it on.
 
 When you choose **Refine with AI**, SuperTodoist sends the reviewed rows and, when the full selection is included and an image preview is available, the selected handwriting image to OpenAI using your key. Refinement returns suggestions for you to review; it never saves tasks automatically. In AI-by-default capture, OCR and AI can run together. You can cancel AI and continue with device OCR. AI requests require internet access and may incur charges from your provider.
 

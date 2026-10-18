@@ -1,4 +1,5 @@
-const DEFAULT_AI_MODELS = ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'];
+const DEFAULT_AI_MODEL = 'gpt-6-luna';
+const DEFAULT_AI_MODELS = [DEFAULT_AI_MODEL, 'gpt-6.1-sol'];
 
 function normalizeAIModels(models, currentModel) {
   const result = [];
@@ -20,4 +21,4 @@ function removeAIModel(models, model) {
   return normalizeAIModels(models.filter(item => item !== model));
 }
 
-module.exports = {DEFAULT_AI_MODELS, normalizeAIModels, addAIModel, removeAIModel};
+module.exports = {DEFAULT_AI_MODEL, DEFAULT_AI_MODELS, normalizeAIModels, addAIModel, removeAIModel};
