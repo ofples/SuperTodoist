@@ -58,6 +58,13 @@ yarn-error.log
 
 # Local config with API tokens - never commit
 config.local.js
+devconfig.json
+.env
+.env.*
+!.env.example
+supertask-token.txt
+*.snplg
+*.hbc
 
 # Dev server logs
 logs/

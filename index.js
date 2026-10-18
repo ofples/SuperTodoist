@@ -1,5 +1,5 @@
 /**
- * SuperTask - Lasso-to-Todoist plugin for Supernote
+ * SuperTodoist - Lasso-to-Todoist plugin for Supernote
  *
  * Entry points:
  *   Button 100 (toolbar, NOTE): "Tasks" - open task viewer
@@ -55,11 +55,11 @@ initLauncher();
 
 const icon = Image.resolveAssetSource(require('./assets/icon.png')).uri;
 
-// Toolbar in NOTE - opens task viewer. Named 'SuperTask' (not 'Tasks') so the
+// Toolbar in NOTE - opens task viewer. Named 'SuperTodoist' (not 'Tasks') so the
 // plugin is identifiable in the sidebar plugins list among other plugins.
 PluginManager.registerButton(1, ['NOTE'], {
   id: 100,
-  name: 'SuperTask',
+  name: 'SuperTodoist',
   icon,
   showType: 1,
 });

@@ -245,7 +245,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
                     canvas.drawPath(check, paint)
                 }
             }
-            panel.tag = tag; panel.contentDescription = "Open SuperTask. Drag to move. Hold for Hide and Settings."
+            panel.tag = tag; panel.contentDescription = "Open SuperTodoist. Drag to move. Hold for Hide and Settings."
             panel.isClickable = true
             panel.setOnClickListener { if (menuWindow != null) removeMenu() else launch() }
             panel.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
@@ -347,7 +347,7 @@ class TaskLauncherModule(private val context: ReactApplicationContext) :
                 val row = TextView(context).apply {
                     text = label; textSize = 18f; setTextColor(Color.BLACK)
                     gravity = Gravity.CENTER_VERTICAL; setPadding(dp(12), 0, dp(12), 0)
-                    contentDescription = "$label SuperTask launcher"; isClickable = true
+                    contentDescription = "$label SuperTodoist launcher"; isClickable = true
                     setOnClickListener { action() }
                 }
                 // The menu is finger-only too. Drag/multi-contact/pen/cancel never

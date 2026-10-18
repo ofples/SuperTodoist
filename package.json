@@ -1,6 +1,6 @@
 {
   "name": "SuperTask",
-  "version": "0.0.1",
+  "version": "0.4.0-beta.29",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -8,7 +8,9 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "test:offline": "node --test tests/*.test.cjs"
+    "test:offline": "node --test tests/*.test.cjs",
+    "build": "pwsh -NoProfile -ExecutionPolicy Bypass -File ./buildPlugin.ps1",
+    "verify:package": "python ./verify_package.py"
   },
   "dependencies": {
     "@ai-sdk/openai": "4.0.83",

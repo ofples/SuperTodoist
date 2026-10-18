@@ -213,9 +213,9 @@ class TaskStorageModule(context: ReactApplicationContext) : ReactContextBaseJava
             val recovered = generation(accountFile(account, "previous"))
             // A stale React context must not replace newer captured tasks.
             if (current != null) {
-                require(current == previous) { "Task storage changed in another session; reopen SuperTask before saving" }
+                require(current == previous) { "Task storage changed in another session; reopen SuperTodoist before saving" }
             } else if (recovered != null) {
-                require(recovered == previous) { "Recovery generation changed; reopen SuperTask before saving" }
+                require(recovered == previous) { "Recovery generation changed; reopen SuperTodoist before saving" }
             } else {
                 require(!accountFile(account, "json").exists() && !accountFile(account, "previous").exists()) {
                     "Task storage is damaged; refusing to replace it"

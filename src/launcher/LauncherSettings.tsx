@@ -117,7 +117,7 @@ export default function LauncherSettings() {
       <Text style={styles.note}>
         Finger only. Tap to open tasks; drag to reposition. Hold for Hide and
         Settings. The button stays at the chosen edge when rotated. It hides
-        while SuperTask is open.
+        while SuperTodoist is open.
       </Text>
       <Text style={styles.note}>
         Pen protection is unavailable: touching the button with the pen can

@@ -7,15 +7,27 @@ import sys
 import zipfile
 
 root = Path(__file__).resolve().parent
-artifact = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/outputs/SuperTask.snplg'
+artifact = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/outputs/SuperTodoist-v0.4.0-beta.29.snplg'
 source = json.loads((root / 'PluginConfig.json').read_text(encoding='utf-8'))
 package = json.loads((root / 'package.json').read_text(encoding='utf-8'))
+app = json.loads((root / 'app.json').read_text(encoding='utf-8'))
+assert source['name'] == 'SuperTodoist'
+assert source['versionName'] == '0.4.0-beta.29' and source['versionCode'] == '34'
+assert package['version'] == source['versionName']
+assert app['displayName'] == source['name']
+assert package['name'] == 'SuperTask', 'Keep the internal bundle/package name for compatibility'
 assert package['dependencies']['react'] == '19.0.0'
 assert package['dependencies']['react-native'] == '0.79.2'
 assert package['dependencies']['sn-plugin-lib'] == '0.1.65'
 with zipfile.ZipFile(artifact) as plugin:
+    names = plugin.namelist()
+    forbidden = ('.hbc', '.jsbundle', '.log', 'config.local', '.env',
+                 'supertask-token.txt', 'debug.keystore')
+    for name in names:
+        lowered = name.lower()
+        assert not any(marker in lowered for marker in forbidden), f'Unexpected debug or secret file: {name}'
     config = json.loads(plugin.read('PluginConfig.json'))
-    for key in ['pluginID', 'pluginKey', 'versionName', 'versionCode', 'author', 'uses-permissions']:
+    for key in ['name', 'pluginID', 'pluginKey', 'versionName', 'versionCode', 'author', 'uses-permissions']:
         assert config[key] == source[key], f'Packaged {key} differs from source'
     assert config['pluginID'] == 'supertask001' and config['pluginKey'] == 'SuperTask'
     assert config['nativeCodePackage'] == '/app.npk'

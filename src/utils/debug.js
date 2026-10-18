@@ -130,7 +130,7 @@ export function clearEntries() {
 export async function exportLog() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const logText = entries.length
-    ? `--- SuperTask Log ${timestamp} ---\n\n${entries.join('\n')}`
+    ? `--- SuperTodoist Log ${timestamp} ---\n\n${entries.join('\n')}`
     : '(no log entries)';
 
   // Make sure the session file is current before anything network-dependent

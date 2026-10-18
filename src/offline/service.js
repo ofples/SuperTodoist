@@ -32,7 +32,7 @@ async function openSession() {
   if (!token) {throw new Error('Configure your Todoist token first. Offline tasks are kept separately for each configured token.');}
   if (session?.token === token) {return session;}
   const storage = NativeModules.TaskStorage;
-  if (!storage) {throw new Error('Private task storage is missing. Install the complete updated SuperTask package.');}
+  if (!storage) {throw new Error('Private task storage is missing. Install the complete updated SuperTodoist package.');}
   const dir = await PluginManager.getPluginDirPath();
   if (!dir) {throw new Error('PluginHost did not provide private storage. No task data was written to shared storage.');}
   const identity = JSON.parse(await storage.initialize(dir, token));
@@ -82,7 +82,7 @@ export async function saveOfflineBatch(drafts, source = null, capturedAt = Date.
   if (alreadySaved.length) {return alreadySaved.map(task => ({...task, syncState: 'pending'}));}
   let index = 0;
   const ids = () => {
-    if (index >= request.ids.length) throw new Error('Capture changed after an uncertain save; reopen SuperTask to review saved tasks.');
+    if (index >= request.ids.length) throw new Error('Capture changed after an uncertain save; reopen SuperTodoist to review saved tasks.');
     return request.ids[index++];
   };
   let created;

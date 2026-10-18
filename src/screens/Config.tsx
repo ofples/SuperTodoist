@@ -594,7 +594,7 @@ export default function Config({nav, initialPage}: Props) {
               label="Config source"
             hint={
               configSource === 'private'
-                ? 'Settings and credentials are stored in SuperTask’s private folder.'
+                ? 'Settings and credentials are stored in SuperTodoist’s private folder.'
                 : 'No persistent config found'
             }>
             <View style={s.sourceChip}>
@@ -606,7 +606,7 @@ export default function Config({nav, initialPage}: Props) {
             label="Permissions"
             hint={
               permStates === null
-                ? 'This firmware does not manage plugin permissions. Tap ? to see what SuperTask does with your files and network.'
+                ? 'This firmware does not manage plugin permissions. Tap ? to see what SuperTodoist does with your files and network.'
                 : 'Private task storage works without shared-folder access. Internet is used for Todoist, optional AI refinement and explicit log upload. Tap ? for details.'
             }
             onInfo={() => setInfoSheet('permissions')}>
@@ -648,10 +648,10 @@ export default function Config({nav, initialPage}: Props) {
         {/* ── General page ── */}
         {page === 'general' && (
         <>
-        <Section title="OPENING SUPERTASK" first onInfo={() => setInfoSheet('opening')}>
+        <Section title="OPENING SUPERTODOIST" first onInfo={() => setInfoSheet('opening')}>
           <SettingRow
             label="Default tab"
-            hint="Where SuperTask lands on a fresh open. Last opened returns to whatever tab you were on when you closed it."
+            hint="Where SuperTodoist lands on a fresh open. Last opened returns to whatever tab you were on when you closed it."
             saved={savedRow === 'defaultTab'}>
             <Segmented
               options={TAB_OPTIONS}
@@ -779,7 +779,7 @@ export default function Config({nav, initialPage}: Props) {
           <Section title="PROJECTS" onInfo={() => setInfoSheet('projects')}>
             <SettingRow
               label="Show projects"
-              hint="Untick projects to hide them across SuperTask"
+              hint="Untick projects to hide them across SuperTodoist"
               saved={savedRow === 'showProjects'}>
               <View style={s.checkGrid}>
                 {projects.map(p => (
@@ -802,7 +802,7 @@ export default function Config({nav, initialPage}: Props) {
         {page === 'setup' && (
           <Section title="AI REFINEMENT">
             {!aiSetupHintDismissed && !aiApiKey.trim() && <View style={s.notice}>
-              <Text style={s.noticeText}>Set up optional AI refinement below. Nothing is sent until you choose Refine with AI.</Text>
+              <Text style={s.noticeText}>AI requests are sent only when AI by default is enabled for lasso capture or when you choose Refine with AI.</Text>
               <Pressable accessibilityRole="button" accessibilityLabel="Dismiss AI setup hint" style={s.btnSmall} onPress={handleDismissAISetupHint}>
                 <Text style={s.btnSmallText}>Dismiss</Text>
               </Pressable>
@@ -870,9 +870,9 @@ export default function Config({nav, initialPage}: Props) {
       <InfoSheet
         visible={infoSheet === 'token'}
         title="How to enter your API token"
-        intro={'1. In Todoist, go to Settings > Integrations > Developer (todoist.com/prefs/integrations). Copy your API token, or issue a new one there.\n\n2. Pick one of the options below. You only need to do this once: the token is saved in SuperTask’s private device folder. Uninstalling or clearing PluginHost data can erase it.'}
+        intro={'1. In Todoist, go to Settings > Integrations > Developer (todoist.com/prefs/integrations). Copy your API token, or issue a new one there.\n\n2. Pick one of the options below. You only need to do this once: the token is saved in SuperTodoist’s private device folder. Uninstalling or clearing PluginHost data can erase it.'}
         sections={[
-          {label: 'Option 1. Import a temporary token file over USB', body: 'From your phone or computer, create a plain text file named **supertask-token.txt** containing only the token.\n\nCreate **MyStyle/SuperTask** over USB if necessary and put the file there. A token file sent through a cloud service can remain in cloud history; direct paste or USB avoids that shared copy.\n\nClose this sheet. Once the file is in place, the **Import** button on the Setup page becomes available; tap it and SuperTask saves the token and deletes the file. Only that one folder is checked.'},
+          {label: 'Option 1. Import a temporary token file over USB', body: 'From your phone or computer, create a plain text file named **supertask-token.txt** containing only the token.\n\nCreate **MyStyle/SuperTask** over USB if necessary and put the file there. A token file sent through a cloud service can remain in cloud history; direct paste or USB avoids that shared copy.\n\nClose this sheet. Once the file is in place, the **Import** button on the Setup page becomes available; tap it and SuperTodoist saves the token and deletes the file. Only that one folder is checked.'},
           {label: 'Option 2. Paste the token with a Bluetooth keyboard', body: 'Pair a Bluetooth keyboard (Supernote Settings > Bluetooth), tap the **Todoist API token** field on the Setup page, paste with Ctrl+V, then tap **Save**.'},
           {label: 'Private storage', body: 'New settings are saved privately. The old shared config is read only for migration, then its credentials are redacted when shared write access is available. Shared copies previously synced to cloud services may remain in their history.'},
           {label: 'Option 4. Type it with the on-screen keyboard', body: 'Tap the **Todoist API token** field on the Setup page and type the 40-character token by hand, then tap **Save**. Slow, but it works with nothing else set up.'},
@@ -921,7 +921,7 @@ export default function Config({nav, initialPage}: Props) {
         title="Debug log server setup"
         intro="The plugin can explicitly upload debug logs over wifi to a small server on your computer. This is optional -- logs are ALWAYS saved on the device at a private rotating log. Use Upload Log to send it explicitly to a server you configure; review it in the plugin before sharing."
         sections={[
-          {label: 'Get the server file', body: 'dev-server.js is a single small file with no dependencies. It comes with the SuperTask download (next to the .snplg) -- save it anywhere on your computer, e.g. your Desktop. It writes received logs to a logs/ folder beside itself.'},
+          {label: 'Get the server file', body: 'dev-server.js is a single small file with no dependencies. It comes with the SuperTodoist download (next to the .snplg) -- save it anywhere on your computer, e.g. your Desktop. It writes received logs to a logs/ folder beside itself.'},
           {label: 'Mac', body: '1. Install Node.js from nodejs.org (or: brew install node)\n2. Open Terminal\n3. cd into the folder where you saved dev-server.js\n4. Run: node dev-server.js\n\nThe server prints its address, e.g. http://192.168.1.20:3000/log -- enter that in the field, then tap Test.'},
           {label: 'Windows', body: '1. Install Node.js from nodejs.org\n2. Open PowerShell (or Command Prompt)\n3. cd into the folder where you saved dev-server.js\n4. Run: node dev-server.js\n5. If Windows Firewall asks, click Allow (private networks)\n\nEnter the printed address in the field, then tap Test.'},
           {label: 'If Test fails', body: "Supernote and computer must be on the SAME wifi network. Use the computer's LAN IP address (192.168.x.x) -- Android cannot resolve .local names. If your computer's IP changed, the server prints the new one on startup; update the field here (no reinstall needed)."},
@@ -934,14 +934,14 @@ export default function Config({nav, initialPage}: Props) {
           behaviour is predictable, not mysterious. */}
       <InfoSheet
         visible={infoSheet === 'opening'}
-        title="Opening SuperTask"
+        title="Opening SuperTodoist"
         intro="Ways to get to your task list from a note, and what to expect once you are there."
         sections={[
-          {label: 'Toolbar button', body: 'Tap SuperTask in the note toolbar plugin menu. Always available; nothing to enable.'},
+          {label: 'Toolbar button', body: 'Tap SuperTodoist in the note toolbar plugin menu. Always available; nothing to enable.'},
           {label: 'Bezel swipe (optional)', body: 'Off by default. Start one finger near the bottom edge and add a second within half a second. Keep both near their starting spots until the second finger lands, then move both upward together at least a finger length before lifting. A third finger, wide spacing, uneven motion, pen activity, or a recent pen stroke cancels the gesture. Pause at least 1.5 seconds after writing. The timing and distance still need device checks.'},
           {label: 'Long press on a task link', body: 'Hold one finger on the dashed box around a captured task for about a second to open that task directly. Always on -- it needs a link under your finger, so nothing accidental can fire it.'},
-          {label: 'Pen cooldown', body: 'For 1.5 seconds after any pen contact, finger gestures are ignored. This is what stops your palm from opening SuperTask mid-sentence. Pause briefly after writing before you gesture.'},
-          {label: 'Default tab', body: 'The tab SuperTask opens on. "Last opened" returns you to whatever tab you were on when you closed it.'},
+          {label: 'Pen cooldown', body: 'For 1.5 seconds after any pen contact, finger gestures are ignored. This is what stops your palm from opening SuperTodoist mid-sentence. Pause briefly after writing before you gesture.'},
+          {label: 'Default tab', body: 'The tab SuperTodoist opens on. "Last opened" returns you to whatever tab you were on when you closed it.'},
           {label: 'Completing tasks', body: 'Tap a task\'s box to select it; tap more to select several. A bar at the top shows Complete and Clear. After completing, the same bar offers Undo until you tap OK.'},
         ]}
         onClose={() => setInfoSheet(null)}
@@ -952,7 +952,7 @@ export default function Config({nav, initialPage}: Props) {
         title="Capturing tasks"
         intro="Turn handwriting into a Todoist task without leaving the note."
         sections={[
-          {label: 'Lasso, then Add Task', body: 'Lasso some handwriting with the pen and tap Add Task in the lasso toolbar. SuperTask recognizes the writing, lets you fix the title and pick a date, priority, and project, then creates the task in Todoist with a link back to this note and page.'},
+          {label: 'Lasso, then Add Task', body: 'Lasso some handwriting with the pen and tap Add Task in the lasso toolbar. SuperTodoist recognizes the writing, lets you fix the title and pick a date, priority, and project, then creates the task in Todoist with a link back to this note and page.'},
           {label: 'Done vs Convert to Text', body: 'After the task is created, Done leaves your handwriting as it is and draws a dashed link box around it. Convert to Text replaces the handwriting with typed text in the same box. Either way the box is a link: long-press it to open the task.'},
           {label: 'Quick Add gesture', body: 'An optional shortcut that skips the toolbar button. Off by default; see the (?) next to that setting.'},
           {label: 'After creating a task', body: 'Whether the form stays open to add another task, or returns you to the note. See its (?).'},
@@ -965,7 +965,7 @@ export default function Config({nav, initialPage}: Props) {
       <InfoSheet
         visible={infoSheet === 'projects'}
         title="Projects"
-        intro="Which Todoist projects SuperTask shows."
+        intro="Which Todoist projects SuperTodoist shows."
         sections={[
           {label: 'Show projects', body: 'Untick a project to hide its tasks from the Today, Upcoming, and Done tabs. Hidden projects can still be chosen in the project picker when you create or edit a task.'},
           {label: 'What is never filtered', body: 'The On Device tab and the This Note panel always show every task you captured from your notes, whatever its project -- they answer "what did I write down here?", not "what is due?".'},
@@ -979,8 +979,8 @@ export default function Config({nav, initialPage}: Props) {
         title="Debugging"
         intro="Tools for troubleshooting. Nothing here is needed for everyday use."
         sections={[
-          {label: 'Debug mode', body: 'Adds Log buttons to screens and unlocks the Debug log and Diagnostics rows below. It does not change how SuperTask behaves.'},
-          {label: 'Where logs live', body: 'SuperTask always keeps a log on the device at its private folder (two rotating files, about 1 MB total). Use the in-app Log screen and explicit Upload Log action for troubleshooting. It records what the plugin did, including task titles and note names, but never your API token.'},
+          {label: 'Debug mode', body: 'Adds Log buttons to screens and unlocks the Debug log and Diagnostics rows below. It does not change how SuperTodoist behaves.'},
+          {label: 'Where logs live', body: 'SuperTodoist always keeps a log on the device at its private folder (two rotating files, about 1 MB total). Use the in-app Log screen and explicit Upload Log action for troubleshooting. It records what the plugin did, including task titles and note names, but never your API token.'},
           {label: 'Debug log server', body: 'Optional: explicitly upload the same log to a computer on your own wifi while you reproduce a problem. Set-up steps are under that row\'s (?).'},
           {label: 'Diagnostics', body: 'A live readout of touch and pen events, used for tuning gestures.'},
         ]}
@@ -989,11 +989,11 @@ export default function Config({nav, initialPage}: Props) {
 
       <InfoSheet
         visible={infoSheet === 'permissions'}
-        title="What SuperTask is allowed to do"
-        intro="Supernote firmware 3.29.44 (2.26.41 on A5X/A6X) lets you decide, per plugin, what it may touch. SuperTask needs three things, and Supernote asks you about each one the first time it is needed: shared access for migration, import and source-note navigation, network access for Todoist or optional AI, and deletion when you import a token file. Private offline storage needs no shared-file permission. Say no to any of them and the matching feature simply stops working."
+        title="What SuperTodoist is allowed to do"
+        intro="Supernote firmware 3.29.44 (2.26.41 on A5X/A6X) lets you decide, per plugin, what it may touch. SuperTodoist needs three things, and Supernote asks you about each one the first time it is needed: shared access for migration, import and source-note navigation, network access for Todoist or optional AI, and deletion when you import a token file. Private offline storage needs no shared-file permission. Say no to any of them and the matching feature simply stops working."
         sections={[
           ...PERMISSION_GROUPS.map(g => ({label: g.label, body: g.why})),
-          {label: 'In short', body: 'Credentials, queues, cached tasks and logs live in the private plugin folder. Shared files are used for migration and explicit token import. Batch capture leaves handwriting unchanged. Todoist sync is automatic while SuperTask is open; optional AI sends selected rows and the crop to OpenAI only when you tap Refine with AI. Logs are uploaded only by an explicit action. If you said no and change your mind, use Allow missing on this screen.'},
+          {label: 'In short', body: 'Credentials, queues, cached tasks and logs live in the private plugin folder. Shared files are used for migration and explicit token import. Batch capture leaves handwriting unchanged. Todoist sync is automatic while SuperTodoist is open. AI by default is off until you enable it in Settings; when enabled, lasso capture sends the selected handwriting image and task details to OpenAI for AI-first recognition while device OCR runs at the same time. Refine with AI sends selected rows and, when the full capture is selected, its image. Both use your configured API key. Logs are uploaded only by an explicit action. If you said no and change your mind, use Allow missing on this screen.'},
         ]}
         onClose={() => setInfoSheet(null)}
       />

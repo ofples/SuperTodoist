@@ -34,7 +34,7 @@
  *      others appear where the reason is self-evident.
  *   3. Technical names appear only inside the expanded "why" text.
  *
- * Scope discipline: every file SuperTask reads or writes lives in
+ * Scope discipline: every file SuperTodoist reads or writes lives in
  * MyStyle/SuperTask, except two read-only exists() pre-flights on note paths.
  * Persistence never deletes: atomic writes rename over the old file, the
  * cache is invalidated by overwriting, the log rotates by copy+truncate. The
@@ -62,7 +62,7 @@ const SHORT = {
 };
 
 /**
- * The three things SuperTask asks for, in the words the user sees.
+ * The three things SuperTodoist asks for, in the words the user sees.
  * `summary` is the one-liner under the row; `why` is the expanded text;
  * `desc` is what the host shows if it re-prompts after a denial.
  */
@@ -71,7 +71,7 @@ export const PERMISSION_GROUPS = [
     id: 'folder',
     label: 'Import legacy settings and open source notes',
     summary: 'Optional shared-folder access. Private task storage needs no file permission.',
-    why: 'SuperTask reads its old settings and task references from MyStyle/SuperTask during migration and can redact the old token after saving privately. Shared access also lets it import a token file and check source notes before opening them. New credentials, cached tasks, queues and troubleshooting logs stay in its private folder. Batch capture reads your lasso selection through Supernote without changing the note. (FILE:READ and FILE:WRITE.)',
+    why: 'SuperTodoist reads its old settings and task references from MyStyle/SuperTask during migration and can redact the old token after saving privately. Shared access also lets it import a token file and check source notes before opening them. New credentials, cached tasks, queues and troubleshooting logs stay in its private folder. Batch capture reads your lasso selection through Supernote without changing the note. (FILE:READ and FILE:WRITE.)',
     permissions: [READ, WRITE],
     desc: 'Allow shared access for legacy migration, token import and source-note navigation. Private settings and offline tasks do not require this.',
   },
@@ -79,7 +79,7 @@ export const PERMISSION_GROUPS = [
     id: 'sync',
     label: 'Network access',
     summary: 'Todoist sync, optional OpenAI refinement, and explicit log upload.',
-    why: 'SuperTask connects to api.todoist.com with your Todoist token. Refine with AI explicitly sends reviewed rows and the selected image to api.openai.com with your separately configured API key. Upload Log sends troubleshooting data only to a server you configure. No AI call is automatic and nothing is sent to the plugin author. (INTERNET.)',
+    why: 'SuperTodoist connects to api.todoist.com with your Todoist token. AI by default is off until you enable it in Settings. When enabled for lasso capture, SuperTodoist sends the selected handwriting image and task details to api.openai.com for AI-first recognition while device OCR runs at the same time. You can also tap Refine with AI to send selected rows and, when the full capture is selected, its handwriting image. Both use your separately configured API key. Upload Log sends troubleshooting data only to a server you configure. Nothing is sent to the plugin author. (INTERNET.)',
     permissions: [INTERNET],
     desc: 'Allow Todoist sync, optional OpenAI refinement and explicit troubleshooting uploads.',
   },
@@ -87,9 +87,9 @@ export const PERMISSION_GROUPS = [
     id: 'cleanup',
     label: 'Clean up after itself',
     summary: 'Deletes only its own files, such as the token file after import.',
-    why: 'When you import your Todoist token from a file, SuperTask deletes that file right after reading it, so your token never sits on the device in plain text. That is the only thing it deletes. It never deletes notes, documents, or anything outside its own folder. (Supernote calls this FILE:DELETE.)',
+    why: 'When you import your Todoist token from a file, SuperTodoist deletes that file right after reading it, so your token never sits on the device in plain text. That is the only thing it deletes. It never deletes notes, documents, or anything outside its own folder. (Supernote calls this FILE:DELETE.)',
     permissions: [DELETE],
-    desc: 'SuperTask deletes the token file after importing it, so your token is not left in plain text. It never deletes notes or documents.',
+    desc: 'SuperTodoist deletes the token file after importing it, so your token is not left in plain text. It never deletes notes or documents.',
   },
 ];
 

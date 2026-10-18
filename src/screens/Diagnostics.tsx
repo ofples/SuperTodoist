@@ -310,8 +310,8 @@ export default function Diagnostics({nav}: Props) {
           linkType: 4,
           rect: {left: 100, top: 100, right: 400, bottom: 140},
           fontSize: 16,
-          fullText: 'SuperTask Dashboard',
-          showText: 'SuperTask Dashboard',
+          fullText: 'SuperTodoist Dashboard',
+          showText: 'SuperTodoist Dashboard',
           isItalic: 0,
         }),
         8000,
@@ -496,7 +496,7 @@ export default function Diagnostics({nav}: Props) {
         const l = el.link || {};
         return `cat=${l.category} X=${l.X} Y=${l.Y} w=${l.width} h=${l.height} dest=${(l.destPath || '').slice(0, 40)} ctrl=[${(l.controlTrailNums || []).join(',')}]`;
       });
-      const msg = `${links.length} links (${stLinks.length} supertask):\n${details.join('\n') || '(none)'}`;
+      const msg = `${links.length} links (${stLinks.length} SuperTodoist task links):\n${details.join('\n') || '(none)'}`;
       log('NavTest', msg);
       setNavResult(`Element bounds:\n${msg}`);
 

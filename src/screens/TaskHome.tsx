@@ -1366,7 +1366,7 @@ export default function TaskHome({nav, focusTab, initialView, active = true}: Pr
         </View> : <>
           <View style={styles.headerLeft}>
             <WorkspaceSidebarToggle collapsed={sidebarCollapsed} onPress={toggleSidebar} />
-            <Text style={[styles.title, {fontSize: Math.round(22 * scale)}]}>SuperTask</Text>
+            <Text style={[styles.title, {fontSize: Math.round(22 * scale)}]}>SuperTodoist</Text>
           </View>
           <HeaderActionButtons onSettings={() => nav.push('config')} onClose={closePlugin} />
         </>}

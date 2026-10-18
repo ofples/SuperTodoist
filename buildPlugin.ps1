@@ -861,7 +861,7 @@ function Build-ReactNativeBundle {
     
     Write-ColorOutput 'Starting React Native bundling...' 'Blue'
     
-    # Build bundle output path and assets directory
+    # Keep Metro/Hermes intermediates outside the package staging directory.
     $bundleOutput = Join-Path $OutputDir "$ProjectName.bundle"
     $assetsDir = $OutputDir
     
@@ -1143,8 +1143,9 @@ function Main {
     $selfCheckOk = Self-CheckScriptIntegrity -ScriptPath $PSCommandPath
     if (-not $selfCheckOk) { return }
     
-    # Set project root directory to current directory
-    $projectRoot = Get-Location
+    # Resolve the project from this script so the checkout builds independently
+    # of the caller's current directory or the former monorepo layout.
+    $projectRoot = Split-Path -Parent $PSCommandPath
     Write-ColorOutput "Project root directory: $projectRoot" 'Green'
     
     # Step 1: Check if build/generated directory exists, create if not
@@ -1152,6 +1153,36 @@ function Main {
     $packageInfo = Get-PackageInfo -ProjectRoot $projectRoot
     $projectName = $packageInfo.name
     $buildGeneratedDir = Join-Path $projectRoot 'build\generated'
+    $bundleWorkDir = Join-Path $projectRoot 'build\bundle-work'
+    $buildOutputsDir = Join-Path $projectRoot 'build\outputs'
+    $projectRootFull = [IO.Path]::GetFullPath($projectRoot).TrimEnd('\')
+    $buildRootFull = [IO.Path]::GetFullPath((Join-Path $projectRootFull 'build')).TrimEnd('\')
+    $releaseConfig = Get-Content -LiteralPath (Join-Path $projectRootFull 'PluginConfig.json') -Raw | ConvertFrom-Json
+    $releaseName = "SuperTodoist-v$($releaseConfig.versionName).snplg"
+
+    # Recreate generated staging from scratch so old bundles, bytecode, config,
+    # icons, or native packages cannot leak into the new .snplg.
+    $cleanupTargets = @(
+        @{ Path = $buildGeneratedDir; Expected = Join-Path $buildRootFull 'generated' },
+        @{ Path = $bundleWorkDir; Expected = Join-Path $buildRootFull 'bundle-work' }
+    )
+    foreach ($target in $cleanupTargets) {
+        $path = [IO.Path]::GetFullPath($target.Path).TrimEnd('\')
+        $expected = [IO.Path]::GetFullPath($target.Expected).TrimEnd('\')
+        if (-not [string]::Equals($path, $expected, [StringComparison]::OrdinalIgnoreCase) -or
+            -not $path.StartsWith("$buildRootFull\", [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Refusing to clear unexpected build path: $path"
+        }
+        if (Test-Path -LiteralPath $path) {
+            Remove-Item -LiteralPath $path -Recurse -Force
+        }
+    }
+    New-Item -ItemType Directory -Path $buildGeneratedDir, $bundleWorkDir -Force | Out-Null
+    New-Item -ItemType Directory -Path $buildOutputsDir -Force | Out-Null
+    foreach ($staleName in @("$($packageInfo.Name).zip", "$($packageInfo.Name).snplg", $releaseName)) {
+        $stalePath = Join-Path $buildOutputsDir $staleName
+        if (Test-Path -LiteralPath $stalePath) { Remove-Item -LiteralPath $stalePath -Force }
+    }
     
     if (Test-Path $buildGeneratedDir) {
         Write-ColorOutput "Detected build/generated directory already exists: $buildGeneratedDir" 'Yellow'
@@ -1162,11 +1193,15 @@ function Main {
     
     # Step 2: Run React Native bundling command
     Write-ColorOutput '=== Step 2: Execute React Native bundling ===' 'Blue'
-    $bundleSuccess = Build-ReactNativeBundle -ProjectRoot $projectRoot -ProjectName $projectName -OutputDir $buildGeneratedDir
+    $bundleSuccess = Build-ReactNativeBundle -ProjectRoot $projectRoot -ProjectName $projectName -OutputDir $bundleWorkDir
     if (-not $bundleSuccess) {
         Write-ColorOutput 'React Native bundling failed, script terminated' 'Red'
         return
     }
+    Get-ChildItem -LiteralPath $bundleWorkDir -Force | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination $buildGeneratedDir -Recurse -Force
+    }
+    Remove-Item -LiteralPath $bundleWorkDir -Recurse -Force
     
     # Step 3: Check if PluginConfig.json file exists in root directory
     Write-ColorOutput '=== Step 3: Check root directory PluginConfig.json ===' 'Blue'
@@ -1283,6 +1318,10 @@ function Main {
     $null = Rename-ToSnplgFile -ZipFilePath $tempZipPath -ProjectName $packageInfo.Name -OutputDir $buildOutputsDir
     if (Test-Path $finalSnplgPath) {
         Write-ColorOutput "Plugin package successfully generated: $finalSnplgPath" 'Green'
+
+        $releasePath = Join-Path $buildOutputsDir $releaseName
+        Copy-Item -LiteralPath $finalSnplgPath -Destination $releasePath -Force
+        Write-ColorOutput "Versioned release package copied: $releasePath" 'Green'
         
         # Display file size information
         $fileInfo = Get-Item -LiteralPath $finalSnplgPath

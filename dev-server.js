@@ -1,5 +1,5 @@
 /**
- * Dev log server - receives debug logs from SuperTask on the Supernote.
+ * Dev log server - receives debug logs from SuperTodoist on the Supernote.
  *
  * Usage:  node dev-server.js
  *
@@ -61,7 +61,7 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && (req.url === '/' || req.url === '/ping')) {
     // /ping doubles as a discovery/identity endpoint: the device (or a future
-    // subnet sweep) can confirm this is the SuperTask log server.
+    // subnet sweep) can confirm this is the SuperTodoist log server.
     res.writeHead(200, {'Content-Type': 'application/json'});
     res.end(JSON.stringify({ok: true, service: 'supertask-dev-server', port: PORT}));
     return;
@@ -73,7 +73,7 @@ const server = http.createServer((req, res) => {
 
 const ip = getLocalIP();
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\nSuperTask dev log server`);
+  console.log(`\nSuperTodoist dev log server`);
   console.log(`Listening on http://${ip}:${PORT}`);
   console.log(`\nSet in plugin Settings > Connections > Debug Log Server:`);
   console.log(`  http://${ip}:${PORT}/log`);

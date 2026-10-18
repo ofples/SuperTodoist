@@ -46,7 +46,7 @@ export default function AISettingsFields({apiKey, model, models, status = '', sa
     <Text style={s.label}>OpenAI API key</Text>
     <KeyboardAwareTextInput accessibilityLabel="OpenAI API key" style={s.input} value={apiKey} onChangeText={onApiKeyChange} secureTextEntry
       autoCapitalize="none" autoCorrect={false} editable={!saving} placeholder="sk-…" />
-    <Text style={s.body}>Stored in SuperTask’s private device folder. Clearing this field disables AI. InkToClipboard has its own settings.</Text>
+    <Text style={s.body}>Stored in SuperTodoist’s private device folder. Clearing this field disables AI. InkToClipboard has its own settings.</Text>
     <Text style={s.label}>Model</Text>
     <Pressable accessibilityRole="button" accessibilityLabel={`Selected AI model ${model}. ${expanded ? 'Hide' : 'Show'} model list`} disabled={saving}
       style={s.input} onPress={() => setExpanded(value => !value)}>

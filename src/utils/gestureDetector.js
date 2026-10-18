@@ -1,5 +1,5 @@
 /**
- * Gesture Detector -- finger gesture detection for SuperTask.
+ * Gesture Detector -- finger gesture detection for SuperTodoist.
  *
  * Three gesture types detected from a single motion listener:
  *

@@ -229,7 +229,7 @@ export default function BatchAdd({nav, active = true, initialContent = '', initi
       if (alive.current) {
         setSaved(true);
         setCreatedTasks(result);
-        setStatus(`Saved ${result.length} task${result.length === 1 ? '' : 's'} on this device. Sync starts while SuperTask is open and resumes next time you open it.`);
+        setStatus(`Saved ${result.length} task${result.length === 1 ? '' : 's'} on this device. Sync starts while SuperTodoist is open and resumes next time you open it.`);
         if (postCreateAction === 'auto-back') autoBackTimer.current = setTimeout(() => {if (alive.current) goBack();}, 500);
       }
     } catch (error: any) {
@@ -301,14 +301,14 @@ export default function BatchAdd({nav, active = true, initialContent = '', initi
         {showBatchLabels && <KeyboardAwareTextInput style={[s.input, scaledInput]} value={defaults.labels.join(', ')} placeholder="Batch labels, separated by commas" editable={!locked}
           onChangeText={value => applyDefault('labels', value.split(',').map(label => label.trim()).filter(Boolean))} />}
         {showAiSetupHint && <View style={s.notice}>
-          <Text style={[s.text, scaledText]}>Set up optional AI refinement in Settings. Nothing is sent until you choose Refine with AI.</Text>
+          <Text style={[s.text, scaledText]}>Set up optional AI in Settings. Lasso capture can request AI first when AI by default is enabled; you can also tap Refine with AI here.</Text>
           <View style={s.actions}>
             <Pressable style={s.button} onPress={() => nav.push('ai-settings')}><Text style={[s.label, scaledLabel]}>Set up AI</Text></Pressable>
             <Pressable style={s.button} onPress={dismissAiSetupHint}><Text style={[s.label, scaledLabel]}>Dismiss</Text></Pressable>
           </View>
         </View>}
         <View style={s.details}>
-          <Text style={[s.text, scaledText]}>Optional AI refinement sends selected rows{activePreview ? ' and the handwriting image when all rows are selected' : ''} to OpenAI using your configured key. Review the structured suggestions before saving.</Text>
+          <Text style={[s.text, scaledText]}>Refine with AI sends selected rows{activePreview ? ' and the handwriting image when all rows are selected' : ''} to OpenAI using your configured key. Review the structured suggestions before saving.</Text>
           <View style={s.actions}><Pressable style={s.button} disabled={busy} onPress={refine}><Text style={[s.label, scaledLabel]}>Refine with AI</Text></Pressable>
             <Pressable style={s.button} disabled={busy} onPress={() => nav.push('ai-settings')}><Text style={[s.label, scaledLabel]}>AI settings</Text></Pressable>
             {undo && <Pressable style={s.button} disabled={busy} onPress={() => {setRows(undo); setUndo(null); setStatus('Restored the rows from before AI refinement.');}}><Text style={[s.label, scaledLabel]}>Undo refinement</Text></Pressable>}

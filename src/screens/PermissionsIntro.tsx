@@ -51,12 +51,12 @@ export default function PermissionsIntro({onDone}: Props) {
       <ScrollView style={s.scroll} contentContainerStyle={s.content}>
         <Text style={[s.title, {fontSize: fs(24)}]}>Before you start</Text>
         <Text style={[s.intro, {fontSize: fs(15), lineHeight: fs(22)}]}>
-          SuperTask keeps everything in one folder of its own on this device and only
+          SuperTodoist keeps everything in one folder of its own on this device and only
           ever talks to your Todoist account. When you tap Continue, Supernote will ask
           you to confirm the three things below, one at a time.
         </Text>
 
-        <Text style={[s.heading, {fontSize: fs(13)}]}>WHAT SUPERTASK NEEDS</Text>
+        <Text style={[s.heading, {fontSize: fs(13)}]}>WHAT SUPERTODOIST NEEDS</Text>
 
         {PERMISSION_GROUPS.map(g => {
           const expanded = !!open[g.id];
@@ -89,7 +89,7 @@ export default function PermissionsIntro({onDone}: Props) {
           </Text>
           <Text style={[s.calloutBody, {fontSize: fs(14), lineHeight: fs(20)}]}>
             "Allow this time only" lasts until you close the plugin, so it will ask again
-            next time. "Don't allow" switches that part of SuperTask off.
+            next time. "Don't allow" switches that part of SuperTodoist off.
           </Text>
         </View>
         <Text style={[s.footnote, {fontSize: fs(13), lineHeight: fs(19)}]}>
@@ -104,7 +104,7 @@ export default function PermissionsIntro({onDone}: Props) {
           <Text style={[s.secondaryText, {fontSize: fs(15)}]}>Not now</Text>
         </Pressable>
         <Text style={[s.footnoteSmall, {fontSize: fs(12), lineHeight: fs(17)}]}>
-          If you choose Not now, SuperTask still opens, but each part will ask for its
+          If you choose Not now, SuperTodoist still opens, but each part will ask for its
           permission the first time you use it.
         </Text>
       </ScrollView>

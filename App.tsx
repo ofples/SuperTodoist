@@ -1,5 +1,5 @@
 /**
- * SuperTask - Root component
+ * SuperTodoist - Root component
  *
  * Stack-based navigation for drill-down flows.
  * Reads initial button ID from global (set by index.js before mount),

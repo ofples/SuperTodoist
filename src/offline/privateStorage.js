@@ -5,7 +5,7 @@ export async function privateStorage() {
   if (!prepared) {
     prepared = (async () => {
       const storage = NativeModules.TaskStorage;
-      if (!storage) throw new Error('Install the complete updated SuperTask package to enable private storage.');
+      if (!storage) throw new Error('Install the complete updated SuperTodoist package to enable private storage.');
       const path = await PluginManager.getPluginDirPath();
       if (!path) throw new Error('PluginHost did not provide private storage.');
       const directory = await storage.prepare(path);

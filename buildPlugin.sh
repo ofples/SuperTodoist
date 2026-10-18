@@ -666,21 +666,31 @@ rename_to_snplg_file() {
 # =========================================================
 # Function: main
 # Purpose: Orchestrate all steps to build plugin package
-# Params: $1 project root (optional, defaults to current directory)
+# Params: $1 project root (optional, defaults to this script's directory)
 # Returns: none
 # =========================================================
 main() {
     test_operating_system
 
-    local project_root="${1:-$(pwd)}"
+    local project_root="${1:-$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)}"
     get_package_info "$project_root"
 
     local gen_dir
     gen_dir="$(ensure_build_generated_dir "$project_root")"
-
-    build_react_native_bundle "$project_root" "$PACKAGE_NAME" "$gen_dir"
-
+    local bundle_work_dir="$project_root/build/bundle-work"
+    local outputs_dir="$project_root/build/outputs"
     local root_cfg="$project_root/PluginConfig.json"
+    local release_version
+    release_version="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["versionName"])' "$root_cfg")"
+    rm -rf -- "$gen_dir" "$bundle_work_dir"
+    mkdir -p -- "$gen_dir" "$bundle_work_dir" "$outputs_dir"
+    rm -f -- "$outputs_dir/$PACKAGE_NAME.zip" "$outputs_dir/$PACKAGE_NAME.snplg" \
+        "$outputs_dir/SuperTodoist-v$release_version.snplg"
+
+    build_react_native_bundle "$project_root" "$PACKAGE_NAME" "$bundle_work_dir"
+    cp -R -- "$bundle_work_dir/." "$gen_dir/"
+    rm -rf -- "$bundle_work_dir"
+
     if [[ -f "$root_cfg" ]]; then
         write_color_output "Detected root directory PluginConfig.json file already exists, skipping generation step" "Yellow"
     else
@@ -723,11 +733,11 @@ main() {
         write_color_output "Build conditions not met; skipping native build and reactPackages update" "Yellow"
     fi
 
-    local outputs_dir
-    outputs_dir="$(ensure_build_outputs_directory "$project_root")"
     local zip_path="$outputs_dir/${PACKAGE_NAME}.zip"
     if new_zip_package "$gen_dir" "$zip_path"; then
         rename_to_snplg_file "$zip_path" "$PACKAGE_NAME" >/dev/null
+        cp -- "$outputs_dir/$PACKAGE_NAME.snplg" "$outputs_dir/SuperTodoist-v$release_version.snplg"
+        write_color_output "Versioned release package copied: $outputs_dir/SuperTodoist-v$release_version.snplg" "Green"
     fi
 
     write_color_output "Build process completed" "Blue"
