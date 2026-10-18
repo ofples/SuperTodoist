@@ -3,8 +3,8 @@
  *
  * Entry points:
  *   Button 100 (toolbar, NOTE): "Tasks" - open task viewer
- *   Button 200 (lasso, NOTE):   "Add Task" - capture lassoed handwriting
- *   Button 300 (toolbar, DOC):  "Add Task" - capture selected PDF text
+ *   Button 200 (lasso, NOTE):   "Add to Todoist" - capture lassoed handwriting
+ *   Button 300 (toolbar, DOC):  "Add to Todoist" - capture selected PDF text
  *   Config button:              Settings - API token, default project
  *
  * @format
@@ -54,6 +54,7 @@ initGestureDetector();
 initLauncher();
 
 const icon = Image.resolveAssetSource(require('./assets/icon.png')).uri;
+const captureIcon = Image.resolveAssetSource(require('./assets/capture-todoist.png')).uri;
 
 // Toolbar in NOTE - opens task viewer. Named 'SuperTodoist' (not 'Tasks') so the
 // plugin is identifiable in the sidebar plugins list among other plugins.
@@ -67,8 +68,8 @@ PluginManager.registerButton(1, ['NOTE'], {
 // Lasso toolbar in NOTE - capture handwritten task
 PluginManager.registerButton(2, ['NOTE'], {
   id: 200,
-  name: 'Add Task',
-  icon,
+  name: 'Add to Todoist',
+  icon: captureIcon,
   editDataTypes: [0, 1, 3], // strokes, titles, text
   showType: 1,
 });
@@ -76,8 +77,8 @@ PluginManager.registerButton(2, ['NOTE'], {
 // Toolbar in DOC - capture selected text as task
 PluginManager.registerButton(1, ['DOC'], {
   id: 300,
-  name: 'Add Task',
-  icon,
+  name: 'Add to Todoist',
+  icon: captureIcon,
   showType: 1,
 });
 
