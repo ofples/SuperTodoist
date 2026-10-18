@@ -60,3 +60,5 @@ Do not change `pluginID`, `pluginKey`, the `com.supertask` native package, or th
 Source-level checks and package inspection are release checks; they do not establish device behavior. The last historical device check was for beta.28 on a Nomad. The beta.29 listing rename and upgrade have not been tested on a device or emulator. Do not present beta.28 results as beta.29 verification.
 
 Official Supernote documentation: [Plugin installation](https://docs.supernote.com/en/first-plugin#install-the-plugin), [plugin permissions](https://docs.supernote.com/en/plugin-base/permission), and [private plugin directory](https://docs.supernote.com/en/plugin-base/permission#default-accessible-scope). The private directory is keyed by `pluginID`, not by the display name.
+
+For the exact beta.29 automated/package results, dependency-audit findings, and pending hardware checklist, see [Release checks](RELEASE-CHECKS.md).
