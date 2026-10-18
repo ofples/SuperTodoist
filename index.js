@@ -1,0 +1,102 @@
+/**
+ * SuperTask - Lasso-to-Todoist plugin for Supernote
+ *
+ * Entry points:
+ *   Button 100 (toolbar, NOTE): "Tasks" - open task viewer
+ *   Button 200 (lasso, NOTE):   "Add Task" - capture lassoed handwriting
+ *   Button 300 (toolbar, DOC):  "Add Task" - capture selected PDF text
+ *   Config button:              Settings - API token, default project
+ *
+ * @format
+ */
+
+import './src/polyfills';
+import {AppRegistry, Image} from 'react-native';
+import App from './App';
+import {name as appName} from './app.json';
+import {PluginManager} from 'sn-plugin-lib';
+import {initGestureDetector} from './src/utils/gestureDetector';
+import {initTaskCache} from './src/cache/taskCache';
+import {markViewOpen, registerLifecycleDiagnostics} from './src/utils/viewState';
+import {logPermissionStates} from './src/utils/permissions';
+import {initLauncher} from './src/launcher/service';
+
+AppRegistry.registerComponent(appName, () => App);
+
+PluginManager.init();
+
+// Config button first: it is registered during JS module evaluation, and
+// the host's plugin menu can render before the runtime is up (B-032 /
+// SNDEV-61). Nothing else in this file should run ahead of it.
+PluginManager.registerConfigButton();
+
+// SDK 0.1.65 (SNDEV-70): lifecycle events in log-only mode (cross-checked
+// against manual view marks), and a permission-state snapshot in the log so
+// a denied permission is visible next to whatever fails because of it. No
+// dialogs here: those belong to the explainer screen (App.tsx) and the
+// just-in-time call sites (permissions.js). Both no-op on old firmware.
+registerLifecycleDiagnostics();
+const permissionsLogged = logPermissionStates();
+
+// Hydrate the last session's task snapshot from disk so a cold open paints
+// the list instantly (stale-while-revalidate across process restarts).
+// Sequenced behind the state snapshot (one quick native round-trip) so the
+// "Cache" and "Perms" lines read in order. TaskHome awaits the same
+// hydration promise if it mounts first (initTaskCache dedups).
+permissionsLogged.then(initTaskCache, initTaskCache);
+
+// Register motion listener at init so long-press gestures work
+// even before the plugin UI has ever been opened. The onMsg callback is
+// SDK-free (pure JS tracking); SDK calls only run after a gesture is
+// classified on finger UP. Config 'off' disables the quick-add lasso
+// gesture only (long press + three-finger tap always on) -- no restart needed.
+initGestureDetector();
+initLauncher();
+
+const icon = Image.resolveAssetSource(require('./assets/icon.png')).uri;
+
+// Toolbar in NOTE - opens task viewer. Named 'SuperTask' (not 'Tasks') so the
+// plugin is identifiable in the sidebar plugins list among other plugins.
+PluginManager.registerButton(1, ['NOTE'], {
+  id: 100,
+  name: 'SuperTask',
+  icon,
+  showType: 1,
+});
+
+// Lasso toolbar in NOTE - capture handwritten task
+PluginManager.registerButton(2, ['NOTE'], {
+  id: 200,
+  name: 'Add Task',
+  icon,
+  editDataTypes: [0, 1, 3], // strokes, titles, text
+  showType: 1,
+});
+
+// Toolbar in DOC - capture selected text as task
+PluginManager.registerButton(1, ['DOC'], {
+  id: 300,
+  name: 'Add Task',
+  icon,
+  showType: 1,
+});
+
+// Set initial button ID BEFORE React mounts.
+// The config event fires before App.tsx useEffect, so we need
+// to capture it here. App.tsx reads this global on mount.
+global.__superTaskButtonId = null;
+
+PluginManager.registerButtonListener({
+  onButtonPress: (msg) => {
+    global.__superTaskButtonId = msg.id;
+    markViewOpen('button'); // showType 1 buttons open the full-screen view (B-031 tracking)
+  },
+});
+
+// SDK 0.1.65 exposes onClick for the config button.
+PluginManager.registerConfigButtonListener({
+  onClick: () => {
+    global.__superTaskButtonId = 'config';
+    markViewOpen('config-button');
+  },
+});
